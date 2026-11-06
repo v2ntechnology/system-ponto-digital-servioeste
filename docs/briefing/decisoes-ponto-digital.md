@@ -76,6 +76,7 @@ Status: **Decidido**, **Provisório** (vale até a validação indicada) ou **Ab
 | D-58 | Cada feature começa pelo frontend com dados simulados; o backend entra depois da validação das telas. | Decidido |
 | D-57 | Motor facial em módulo trocável. Proposta: motor de testes + AWS Rekognition na validação. | Aberto |
 | D-59 | Repositório único com todo o frontend em `system-ponto-digital-servioeste-front` e todo o backend em `system-ponto-digital-servioeste-back`; o contrato da API fica em `system-ponto-digital-servioeste-back/contracts/openapi.yaml` e o front gera os tipos dele. Front e back são independentes, sem `package.json` nem `node_modules` na raiz. Pasta do app mobile/tablet a definir na feature 002/003. | Decidido |
+| D-60 | Área de desenvolvimento em `/dev` (plano, board, histórico, dúvidas do RH, conceitos), só no servidor de desenvolvimento e fora do build de produção. Lê `specs/*/tasks.md`, `docs/briefing/*.md` e o `git log`; grava respostas do RH em `pendencias.md`. | Decidido |
 
 ## Motor facial (D-57)
 

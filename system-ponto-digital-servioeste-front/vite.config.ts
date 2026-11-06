@@ -5,6 +5,8 @@ import tailwindcss from "@tailwindcss/vite"
 import react from "@vitejs/plugin-react"
 import { defineConfig, type Plugin } from "vite"
 
+import { areaDev } from "./dev-tools/plugin"
+
 /**
  * Serve o service worker do MSW só no servidor de desenvolvimento, direto do node_modules.
  * Assim o arquivo nunca fica em public/ e nunca vai para o build de produção (Princípio XII).
@@ -25,7 +27,8 @@ function mswSoEmDev(): Plugin {
 }
 
 export default defineConfig({
-  plugins: [react(), tailwindcss(), mswSoEmDev()],
+  // areaDev: telas internas em /dev (plano, board, histórico, dúvidas do RH, conceitos). Só no servidor de dev.
+  plugins: [react(), tailwindcss(), mswSoEmDev(), areaDev(path.resolve(__dirname, ".."))],
   resolve: {
     alias: { "@": path.resolve(__dirname, "./src") },
   },

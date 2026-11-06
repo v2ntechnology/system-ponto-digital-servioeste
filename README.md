@@ -38,3 +38,16 @@ Portas de desenvolvimento: Postgres **5434**, API **8002**, Vite **5175**. Não 
 (5432/8000/5173) nem com o Hub (5433/8001/5174), então os três rodam juntos.
 
 `make help` lista todos os comandos.
+
+## Área de desenvolvimento
+
+Rodando localmente (`npm run dev` ou `npm run dev:mock`), abra http://localhost:5175/dev. Não precisa de login e não
+existe no build de produção.
+
+| Tela | O que mostra | De onde vem |
+|---|---|---|
+| Plano | As 9 features, a etapa no Spec Kit e o andamento das fases | `docs/briefing/features/`, `specs/*/tasks.md` |
+| Board | Tarefas em A fazer, Em andamento e Feito | `specs/*/tasks.md` (marcar `[X]` move para Feito) |
+| Histórico | Commits como nova funcionalidade, atualizado, apagado… | `git log` |
+| Dúvidas do RH | As perguntas `RH-xx`, com campo para anotar a resposta | `docs/briefing/pendencias.md` (a resposta é gravada no arquivo) |
+| Conceitos | Glossário (NSR, ARP, AFD, escopo…) | `docs/briefing/glossario.md` |

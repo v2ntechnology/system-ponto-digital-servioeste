@@ -1,6 +1,6 @@
 import { ArrowRight, Eye, EyeOff, FlaskConical, Lock, Mail } from "lucide-react"
 import { useState, type FormEvent } from "react"
-import { Navigate, useLocation, useNavigate } from "react-router-dom"
+import { Link, Navigate, useLocation, useNavigate } from "react-router-dom"
 
 import { Brand } from "@/components/layout/Brand"
 import { ThemeToggle } from "@/components/layout/ThemeToggle"
@@ -105,6 +105,11 @@ export function LoginPage() {
 
         <footer className="text-center text-xs text-muted-foreground">
           Acesso restrito. Esqueceu a senha ou perdeu o celular do autenticador? Fale com o administrador.
+          {import.meta.env.DEV && (
+            <Link to="/dev" className="mt-2 flex items-center justify-center gap-1 text-brand underline-offset-4 hover:underline">
+              <FlaskConical className="size-3.5" /> Área de desenvolvimento
+            </Link>
+          )}
         </footer>
       </section>
     </div>

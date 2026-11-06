@@ -13,6 +13,14 @@ import { FuncionariosPage } from "@/pages/FuncionariosPage"
 import { LoginPage } from "@/pages/LoginPage"
 import { MfaPage } from "@/pages/MfaPage"
 
+/**
+ * Área de desenvolvimento (/dev): plano, board, histórico, dúvidas do RH e conceitos.
+ * Só em desenvolvimento: no build de produção `import.meta.env.DEV` vira `false` e o import some do pacote.
+ */
+const rotasDev: RouteObject[] = import.meta.env.DEV
+  ? [{ path: "/dev/*", lazy: async () => ({ Component: (await import("@/dev/DevApp")).DevApp }), errorElement: <ErrorPage /> }]
+  : []
+
 /** Rotas do painel. Exportadas para os testes montarem o mesmo app com um roteador em memória. */
 export const rotas: RouteObject[] = [
   { path: "/login", element: <LoginPage />, errorElement: <ErrorPage /> },
@@ -53,5 +61,6 @@ export const rotas: RouteObject[] = [
       { path: "/configuracoes", element: <ConfiguracoesPage /> },
     ],
   },
+  ...rotasDev,
   { path: "*", element: <Navigate to="/" replace /> },
 ]

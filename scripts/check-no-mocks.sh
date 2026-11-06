@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Princípio XII: dados simulados nunca chegam à produção.
-# Falha se o build de produção do front-end contiver o MSW ou o service worker dele.
+# Falha se o build de produção do front-end contiver o MSW, o service worker dele ou a área de desenvolvimento (/dev).
 set -euo pipefail
 
 DIST="${1:-system-ponto-digital-servioeste-front/dist}"
@@ -11,7 +11,7 @@ if [ ! -d "$DIST" ]; then
 fi
 
 # Padrões específicos do MSW (não só "msw", que pode aparecer por acaso num hash de nome de arquivo).
-PADROES=(-e 'mockServiceWorker' -e '\[MSW\]' -e 'msw/browser' -e 'setupWorker')
+PADROES=(-e 'mockServiceWorker' -e '\[MSW\]' -e 'msw/browser' -e 'setupWorker' -e '/__dev' -e 'DevApp')
 
 if grep -rIl "${PADROES[@]}" "$DIST" >/dev/null 2>&1 \
   || find "$DIST" -name 'mockServiceWorker.js' | grep -q .; then

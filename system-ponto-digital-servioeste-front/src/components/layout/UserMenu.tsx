@@ -1,4 +1,4 @@
-import { LogOut, Menu, Monitor, Moon, Settings, Sun } from "lucide-react"
+import { FlaskConical, LogOut, Menu, Monitor, Moon, Settings, Sun } from "lucide-react"
 import { useEffect, useId, useRef, useState } from "react"
 import { Link, useNavigate } from "react-router-dom"
 
@@ -59,6 +59,11 @@ export function UserMenu() {
           <Link to="/configuracoes" className={itemClass} onClick={() => setAberto(false)}>
             <Settings className="size-4 text-brand" /> Configurações
           </Link>
+          {import.meta.env.DEV && (
+            <Link to="/dev" className={itemClass} onClick={() => setAberto(false)}>
+              <FlaskConical className="size-4 text-brand" /> Área de desenvolvimento
+            </Link>
+          )}
 
           <div className="my-1.5 border-t" />
           <p className="px-3 pb-1.5 pt-1 text-xs text-muted-foreground">Tema</p>
