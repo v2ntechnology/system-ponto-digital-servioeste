@@ -40,18 +40,18 @@ automatizado de imutabilidade) os exigem. O SC-002 exige teste de escopo em toda
 
 **Objetivo**: criar o repositório único, o contrato e o esqueleto do app web no padrão do Hub.
 
-- [ ] T001 Criar `pnpm-workspace.yaml` com `apps/*` e `packages/*` e `package.json` na raiz (privado, scripts `contracts`, `dev:web`, `build:web`, `lint:web`, `test:web`)
-- [ ] T002 [P] Criar `packages/contracts/` com `package.json` (nome `@ponto/contracts`, devDependency `openapi-typescript`, script `gen` que gera `src/schema.d.ts`) e copiar `specs/001-fundacao-cadastros/contracts/openapi.yaml` para `packages/contracts/openapi.yaml`
-- [ ] T003 Gerar e versionar `packages/contracts/src/schema.d.ts` e criar `packages/contracts/src/index.ts` exportando aliases legíveis (`Empresa`, `Estabelecimento`, `Unidade`, `Setor`, `Funcionario`, `FuncionarioResumo`, `Feriado`, `Usuario`, `Eu`, `Erro`, `RegistroAuditoria`, `EventoArp`)
-- [ ] T004 Criar `apps/web` com Vite 6 + React 19 + TypeScript 5.8, copiando do Hub `frontend/package.json` (renomear para `web`, adicionar `@ponto/contracts: workspace:*`, `msw`, `qrcode`, `vitest`, `@testing-library/react`, `@testing-library/user-event`, `jsdom`), `tsconfig*.json`, `eslint.config.js`, `components.json` e `index.html` (título "Servioeste Ponto")
-- [ ] T005 Configurar `apps/web/vite.config.ts` como o do Hub, com porta **5175**, proxy `/api` → `http://127.0.0.1:8002`, alias `@` → `src`, e bloco `test` do Vitest (`environment: "jsdom"`, setup em `apps/web/tests/setup.ts`)
-- [ ] T006 [P] Copiar do Hub para `apps/web/public/`: `favicon.svg`, `logo-servioeste.svg`, `apple-touch-icon.png` e `login-servioeste.webp`
-- [ ] T007 [P] Copiar do Hub `frontend/src/index.css` para `apps/web/src/index.css` sem alterar os tokens (`--primary #6ca33c`/`#7fb84e`, fundo `#ffffff`/`#000000`, raio `0.75rem`, `.no-scrollbar`)
-- [ ] T008 [P] Copiar do Hub `lib/utils.ts`, `lib/theme.tsx` (trocar a chave do localStorage para `ponto-tema`) e `lib/format.ts` para `apps/web/src/lib/`
-- [ ] T009 [P] Criar `Makefile` na raiz com `help`, `install`, `contracts`, `front`, `front-mock` (`VITE_MOCK=true`), `build-web`, `check-no-mocks`, `test-web`, `lint-web` (os alvos do backend entram na T080)
-- [ ] T010 [P] Criar `scripts/check-no-mocks.sh` que falha se `apps/web/dist` contiver `msw` ou `mockServiceWorker`, e ligá-lo em `make check-no-mocks`
-- [ ] T011 [P] Criar `.github/workflows/ci.yml` com o job `web`: `pnpm install`, `pnpm contracts` (falha se `schema.d.ts` mudar), `pnpm lint:web`, `pnpm test:web`, `pnpm build:web`, `make check-no-mocks`
-- [ ] T012 [P] Atualizar o `README.md` da raiz com os comandos de desenvolvimento (`make install`, `make front-mock`) e as portas 5434/8002/5175
+- [X] T001 Criar `pnpm-workspace.yaml` com `apps/*` e `packages/*` e `package.json` na raiz (privado, scripts `contracts`, `dev:web`, `build:web`, `lint:web`, `test:web`)
+- [X] T002 [P] Criar `packages/contracts/` com `package.json` (nome `@ponto/contracts`, devDependency `openapi-typescript`, script `gen` que gera `src/schema.d.ts`) e copiar `specs/001-fundacao-cadastros/contracts/openapi.yaml` para `packages/contracts/openapi.yaml`
+- [X] T003 Gerar e versionar `packages/contracts/src/schema.d.ts` e criar `packages/contracts/src/index.ts` exportando aliases legíveis (`Empresa`, `Estabelecimento`, `Unidade`, `Setor`, `Funcionario`, `FuncionarioResumo`, `Feriado`, `Usuario`, `Eu`, `Erro`, `RegistroAuditoria`, `EventoArp`)
+- [X] T004 Criar `apps/web` com Vite 6 + React 19 + TypeScript 5.8, copiando do Hub `frontend/package.json` (renomear para `web`, adicionar `@ponto/contracts: workspace:*`, `msw`, `qrcode`, `vitest`, `@testing-library/react`, `@testing-library/user-event`, `jsdom`), `tsconfig*.json`, `eslint.config.js`, `components.json` e `index.html` (título "Servioeste Ponto")
+- [X] T005 Configurar `apps/web/vite.config.ts` como o do Hub, com porta **5175**, proxy `/api` → `http://127.0.0.1:8002`, alias `@` → `src`, e bloco `test` do Vitest (`environment: "jsdom"`, setup em `apps/web/tests/setup.ts`)
+- [X] T006 [P] Copiar do Hub para `apps/web/public/`: `favicon.svg`, `logo-servioeste.svg`, `apple-touch-icon.png` e `login-servioeste.webp`
+- [X] T007 [P] Copiar do Hub `frontend/src/index.css` para `apps/web/src/index.css` sem alterar os tokens (`--primary #6ca33c`/`#7fb84e`, fundo `#ffffff`/`#000000`, raio `0.75rem`, `.no-scrollbar`)
+- [X] T008 [P] Copiar do Hub `lib/utils.ts`, `lib/theme.tsx` (trocar a chave do localStorage para `ponto-tema`) e `lib/format.ts` para `apps/web/src/lib/`
+- [X] T009 [P] Criar `Makefile` na raiz com `help`, `install`, `contracts`, `front`, `front-mock` (`VITE_MOCK=true`), `build-web`, `check-no-mocks`, `test-web`, `lint-web` (os alvos do backend entram na T080)
+- [X] T010 [P] Criar `scripts/check-no-mocks.sh` que falha se `apps/web/dist` contiver `msw` ou `mockServiceWorker`, e ligá-lo em `make check-no-mocks`
+- [X] T011 [P] Criar `.github/workflows/ci.yml` com o job `web`: `pnpm install`, `pnpm contracts` (falha se `schema.d.ts` mudar), `pnpm lint:web`, `pnpm test:web`, `pnpm build:web`, `make check-no-mocks`
+- [X] T012 [P] Atualizar o `README.md` da raiz com os comandos de desenvolvimento (`make install`, `make front-mock`) e as portas 5434/8002/5175
 
 **Ponto de controle**: `make front-mock` abre uma página em branco com o tema do Hub em http://localhost:5175.
 

@@ -1,0 +1,27 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+
+jobs:
+  web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - name: Contrato e tipos gerados estão em dia
+        run: |
+          pnpm contracts
+          git diff --exit-code packages/contracts/src/schema.d.ts
+      - run: pnpm lint:web
+      - run: pnpm test:web
+      - run: pnpm build:web
+      - name: Nenhum dado simulado no build de produção
+        run: ./scripts/check-no-mocks.sh

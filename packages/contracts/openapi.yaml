@@ -1,0 +1,961 @@
+openapi: 3.1.0
+info:
+  title: Ponto Digital Servioeste - API (feature 001)
+  version: 0.1.0
+  description: |
+    Contrato da feature 001 (fundação e cadastros). Fonte da verdade: este arquivo é copiado para
+    packages/contracts/openapi.yaml, de onde saem os tipos TypeScript e os testes de contrato do backend.
+    Sessão por cookie httpOnly. Todas as rotas exigem sessão com MFA concluído, exceto as marcadas com
+    `security: []` ou com a tag `mfa`. Erros seguem o schema `Erro`. Nenhuma resposta de erro contém CPF.
+servers:
+  - url: /api
+tags:
+  - name: auth
+  - name: mfa
+  - name: estrutura
+  - name: funcionarios
+  - name: feriados
+  - name: usuarios
+  - name: auditoria
+  - name: config
+
+security:
+  - sessao: []
+
+paths:
+  /auth/login:
+    post:
+      tags: [auth]
+      security: []
+      summary: Entra com e-mail e senha. Para Administrador e RH, a sessão nasce com MFA pendente.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LoginEntrada" }
+      responses:
+        "200":
+          description: Sessão criada (cookie)
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/LoginResultado" }
+        "401": { $ref: "#/components/responses/NaoAutenticado" }
+        "429": { $ref: "#/components/responses/MuitasTentativas" }
+  /auth/logout:
+    post:
+      tags: [auth]
+      summary: Encerra a sessão
+      responses:
+        "204": { description: Encerrada }
+  /auth/me:
+    get:
+      tags: [auth]
+      summary: Usuário da sessão, com perfil, permissões e escopo
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Eu" }
+        "401": { $ref: "#/components/responses/NaoAutenticado" }
+  /auth/senha:
+    post:
+      tags: [auth]
+      summary: Troca a própria senha
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [senha_atual, senha_nova]
+              properties:
+                senha_atual: { type: string }
+                senha_nova: { type: string, minLength: 10 }
+      responses:
+        "204": { description: Trocada }
+        "400": { $ref: "#/components/responses/Invalido" }
+
+  /auth/mfa/cadastro:
+    post:
+      tags: [mfa]
+      summary: Gera um segredo TOTP novo (primeiro acesso ou após redefinição)
+      responses:
+        "200":
+          description: URI otpauth para o QR code
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [otpauth_uri]
+                properties:
+                  otpauth_uri: { type: string }
+        "409": { description: MFA já cadastrado }
+  /auth/mfa/verificar:
+    post:
+      tags: [mfa]
+      summary: Confirma o código de 6 dígitos (conclui cadastro e/ou libera a sessão)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [codigo]
+              properties:
+                codigo: { type: string, pattern: "^[0-9]{6}$" }
+      responses:
+        "200":
+          description: Sessão liberada
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Eu" }
+        "401": { $ref: "#/components/responses/NaoAutenticado" }
+        "429": { $ref: "#/components/responses/MuitasTentativas" }
+
+  /empresas:
+    get:
+      tags: [estrutura]
+      summary: Lista empresas
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: "#/components/schemas/Empresa" } }
+    post:
+      tags: [estrutura]
+      summary: Cadastra empresa (Administrador). Grava evento de empregador no ARP.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/EmpresaEntrada" }
+      responses:
+        "201":
+          description: Criada
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Empresa" }
+        "400": { $ref: "#/components/responses/Invalido" }
+        "403": { $ref: "#/components/responses/Negado" }
+        "409": { $ref: "#/components/responses/Conflito" }
+  /empresas/{id}:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    patch:
+      tags: [estrutura]
+      summary: Altera dados ou desativa. Grava evento de empregador em cada estabelecimento.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/EmpresaAlteracao" }
+      responses:
+        "200":
+          description: Alterada
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Empresa" }
+        "403": { $ref: "#/components/responses/Negado" }
+        "404": { $ref: "#/components/responses/NaoEncontrado" }
+
+  /estabelecimentos:
+    get:
+      tags: [estrutura]
+      parameters:
+        - { name: empresa_id, in: query, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: "#/components/schemas/Estabelecimento" } }
+    post:
+      tags: [estrutura]
+      summary: Cadastra estabelecimento (Administrador). Inicia o NSR e grava evento de empregador.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/EstabelecimentoEntrada" }
+      responses:
+        "201":
+          description: Criado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Estabelecimento" }
+        "400": { $ref: "#/components/responses/Invalido" }
+        "403": { $ref: "#/components/responses/Negado" }
+        "409": { $ref: "#/components/responses/Conflito" }
+  /estabelecimentos/{id}:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    patch:
+      tags: [estrutura]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/EstabelecimentoAlteracao" }
+      responses:
+        "200":
+          description: Alterado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Estabelecimento" }
+        "403": { $ref: "#/components/responses/Negado" }
+        "404": { $ref: "#/components/responses/NaoEncontrado" }
+
+  /unidades:
+    get:
+      tags: [estrutura]
+      summary: Lista unidades visíveis no escopo do usuário
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: "#/components/schemas/Unidade" } }
+    post:
+      tags: [estrutura]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UnidadeEntrada" }
+      responses:
+        "201":
+          description: Criada
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Unidade" }
+        "400": { $ref: "#/components/responses/Invalido" }
+        "403": { $ref: "#/components/responses/Negado" }
+  /unidades/{id}:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    patch:
+      tags: [estrutura]
+      summary: Altera dados, desativa ou troca o estabelecimento (fecha a vigência atual e abre outra)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UnidadeAlteracao" }
+      responses:
+        "200":
+          description: Alterada
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Unidade" }
+        "403": { $ref: "#/components/responses/Negado" }
+        "404": { $ref: "#/components/responses/NaoEncontrado" }
+
+  /setores:
+    get:
+      tags: [estrutura]
+      parameters:
+        - { name: unidade_id, in: query, schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: "#/components/schemas/Setor" } }
+    post:
+      tags: [estrutura]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/SetorEntrada" }
+      responses:
+        "201":
+          description: Criado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Setor" }
+        "403": { $ref: "#/components/responses/Negado" }
+        "409": { $ref: "#/components/responses/Conflito" }
+  /setores/{id}:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    patch:
+      tags: [estrutura]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nome: { type: string }
+                ativo: { type: boolean }
+      responses:
+        "200":
+          description: Alterado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Setor" }
+        "403": { $ref: "#/components/responses/Negado" }
+
+  /tipos-vinculo:
+    get:
+      tags: [config]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: "#/components/schemas/TipoVinculo" } }
+    post:
+      tags: [config]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [nome]
+              properties:
+                nome: { type: string }
+      responses:
+        "201":
+          description: Criado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/TipoVinculo" }
+        "403": { $ref: "#/components/responses/Negado" }
+
+  /funcionarios:
+    get:
+      tags: [funcionarios]
+      summary: Lista paginada, sempre filtrada pelo escopo do usuário. Gera auditoria de leitura.
+      parameters:
+        - { name: busca, in: query, description: "nome, CPF ou matrícula", schema: { type: string } }
+        - { name: unidade_id, in: query, schema: { type: string, format: uuid } }
+        - { name: setor_id, in: query, schema: { type: string, format: uuid } }
+        - { name: situacao, in: query, schema: { type: string, enum: [ativo, desligado, todos], default: ativo } }
+        - { name: tipo_registro, in: query, schema: { $ref: "#/components/schemas/TipoRegistro" } }
+        - { name: pagina, in: query, schema: { type: integer, minimum: 1, default: 1 } }
+        - { name: por_pagina, in: query, schema: { type: integer, minimum: 1, maximum: 100, default: 50 } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/PaginaFuncionarios" }
+    post:
+      tags: [funcionarios]
+      summary: Cadastra funcionário com lotação inicial. Grava inclusão de empregado no ARP.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/FuncionarioEntrada" }
+      responses:
+        "201":
+          description: Criado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Funcionario" }
+        "400": { $ref: "#/components/responses/Invalido" }
+        "403": { $ref: "#/components/responses/Negado" }
+        "409": { $ref: "#/components/responses/Conflito" }
+  /funcionarios/{id}:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    get:
+      tags: [funcionarios]
+      summary: Ficha completa. 404 também quando fora do escopo (não revela existência); gera auditoria.
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Funcionario" }
+        "404": { $ref: "#/components/responses/NaoEncontrado" }
+    patch:
+      tags: [funcionarios]
+      summary: Altera dados cadastrais. Grava alteração de empregado no ARP.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/FuncionarioAlteracao" }
+      responses:
+        "200":
+          description: Alterado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Funcionario" }
+        "400": { $ref: "#/components/responses/Invalido" }
+        "404": { $ref: "#/components/responses/NaoEncontrado" }
+        "409": { $ref: "#/components/responses/Conflito" }
+  /funcionarios/{id}/lotacoes:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    post:
+      tags: [funcionarios]
+      summary: Transfere (fecha a lotação vigente no dia anterior e abre a nova)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LotacaoEntrada" }
+      responses:
+        "201":
+          description: Criada
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Lotacao" }
+        "400": { $ref: "#/components/responses/Invalido" }
+        "404": { $ref: "#/components/responses/NaoEncontrado" }
+  /funcionarios/{id}/locais-prestacao:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    post:
+      tags: [funcionarios]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/LocalPrestacaoEntrada" }
+      responses:
+        "201":
+          description: Criado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/LocalPrestacao" }
+        "400": { $ref: "#/components/responses/Invalido" }
+        "404": { $ref: "#/components/responses/NaoEncontrado" }
+  /funcionarios/{id}/desligamento:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    post:
+      tags: [funcionarios]
+      summary: Registra o desligamento. Grava exclusão de empregado no ARP e sinaliza a biometria.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [desligado_em]
+              properties:
+                desligado_em: { type: string, format: date }
+      responses:
+        "200":
+          description: Desligado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Funcionario" }
+        "400": { $ref: "#/components/responses/Invalido" }
+        "404": { $ref: "#/components/responses/NaoEncontrado" }
+
+  /feriados:
+    get:
+      tags: [feriados]
+      parameters:
+        - { name: ano, in: query, required: true, schema: { type: integer } }
+        - { name: unidade_id, in: query, description: "feriados que valem para a unidade", schema: { type: string, format: uuid } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: "#/components/schemas/Feriado" } }
+    post:
+      tags: [feriados]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/FeriadoEntrada" }
+      responses:
+        "201":
+          description: Criado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Feriado" }
+        "400": { $ref: "#/components/responses/Invalido" }
+        "403": { $ref: "#/components/responses/Negado" }
+  /feriados/{id}:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    patch:
+      tags: [feriados]
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                nome: { type: string }
+                ativo: { type: boolean }
+      responses:
+        "200":
+          description: Alterado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Feriado" }
+        "403": { $ref: "#/components/responses/Negado" }
+
+  /usuarios:
+    get:
+      tags: [usuarios]
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: "#/components/schemas/Usuario" } }
+        "403": { $ref: "#/components/responses/Negado" }
+    post:
+      tags: [usuarios]
+      summary: Cria usuário do painel com perfil e escopo (Administrador)
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UsuarioEntrada" }
+      responses:
+        "201":
+          description: Criado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Usuario" }
+        "400": { $ref: "#/components/responses/Invalido" }
+        "403": { $ref: "#/components/responses/Negado" }
+        "409": { $ref: "#/components/responses/Conflito" }
+  /usuarios/{id}:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    patch:
+      tags: [usuarios]
+      summary: Altera perfil, escopo ou desativa. Recusa desativar o último administrador.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema: { $ref: "#/components/schemas/UsuarioAlteracao" }
+      responses:
+        "200":
+          description: Alterado
+          content:
+            application/json:
+              schema: { $ref: "#/components/schemas/Usuario" }
+        "403": { $ref: "#/components/responses/Negado" }
+        "409": { $ref: "#/components/responses/Conflito" }
+  /usuarios/{id}/mfa/redefinir:
+    parameters: [{ $ref: "#/components/parameters/Id" }]
+    post:
+      tags: [usuarios]
+      summary: Apaga o segundo fator do usuário; ele recadastra no próximo acesso. Auditado.
+      responses:
+        "204": { description: Redefinido }
+        "403": { $ref: "#/components/responses/Negado" }
+
+  /auditoria:
+    get:
+      tags: [auditoria]
+      parameters:
+        - { name: acao, in: query, schema: { type: string } }
+        - { name: usuario_id, in: query, schema: { type: string, format: uuid } }
+        - { name: objeto_id, in: query, schema: { type: string, format: uuid } }
+        - { name: resultado, in: query, schema: { type: string, enum: [permitido, negado] } }
+        - { name: antes_de, in: query, schema: { type: string, format: date-time } }
+        - { name: por_pagina, in: query, schema: { type: integer, maximum: 200, default: 50 } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: "#/components/schemas/RegistroAuditoria" } }
+        "403": { $ref: "#/components/responses/Negado" }
+  /arp/eventos:
+    get:
+      tags: [auditoria]
+      summary: Eventos do ARP de um estabelecimento (somente leitura, Administrador)
+      parameters:
+        - { name: estabelecimento_id, in: query, required: true, schema: { type: string, format: uuid } }
+        - { name: a_partir_nsr, in: query, schema: { type: integer, minimum: 1 } }
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema: { type: array, items: { $ref: "#/components/schemas/EventoArp" } }
+        "403": { $ref: "#/components/responses/Negado" }
+
+components:
+  securitySchemes:
+    sessao:
+      type: apiKey
+      in: cookie
+      name: ponto_sessao
+
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema: { type: string, format: uuid }
+
+  responses:
+    Invalido:
+      description: Dados inválidos
+      content: { application/json: { schema: { $ref: "#/components/schemas/Erro" } } }
+    NaoAutenticado:
+      description: Sem sessão, credenciais erradas ou MFA pendente
+      content: { application/json: { schema: { $ref: "#/components/schemas/Erro" } } }
+    Negado:
+      description: Perfil sem permissão (registrado na auditoria)
+      content: { application/json: { schema: { $ref: "#/components/schemas/Erro" } } }
+    NaoEncontrado:
+      description: Não existe ou está fora do escopo
+      content: { application/json: { schema: { $ref: "#/components/schemas/Erro" } } }
+    Conflito:
+      description: Viola unicidade ou regra de estado (CPF ativo, matrícula, último administrador)
+      content: { application/json: { schema: { $ref: "#/components/schemas/Erro" } } }
+    MuitasTentativas:
+      description: Limite de tentativas atingido
+      content: { application/json: { schema: { $ref: "#/components/schemas/Erro" } } }
+
+  schemas:
+    Erro:
+      type: object
+      required: [detail]
+      properties:
+        detail: { type: string, description: "Mensagem em português, sem dados pessoais" }
+        campo: { type: [string, "null"] }
+        codigo: { type: [string, "null"], examples: [cpf_invalido, cpf_ja_ativo, matricula_em_uso] }
+        funcionario_id:
+          type: [string, "null"]
+          format: uuid
+          description: "Só em cpf_ja_ativo e só quando o funcionário existente está no escopo de quem pediu"
+
+    Perfil: { type: string, enum: [administrador, rh, gestor] }
+    TipoRegistro: { type: string, enum: [tablet, app] }
+    TipoIdentificador: { type: string, enum: [cnpj, cpf, caepf, cno] }
+
+    Endereco:
+      type: object
+      required: [logradouro, numero, bairro, cidade, uf, cep]
+      properties:
+        logradouro: { type: string }
+        numero: { type: string }
+        complemento: { type: [string, "null"] }
+        bairro: { type: string }
+        cidade: { type: string }
+        uf: { type: string, pattern: "^[A-Z]{2}$" }
+        cep: { type: string, pattern: "^[0-9]{8}$" }
+
+    LoginEntrada:
+      type: object
+      required: [email, senha]
+      properties:
+        email: { type: string, format: email }
+        senha: { type: string }
+    LoginResultado:
+      type: object
+      required: [mfa]
+      properties:
+        mfa:
+          type: string
+          enum: [nao_exigido, verificar, cadastrar]
+          description: "verificar = pedir código; cadastrar = mostrar QR code (primeiro acesso)"
+
+    Escopo:
+      type: object
+      required: [todas_unidades, unidade_ids, setor_ids]
+      properties:
+        todas_unidades: { type: boolean }
+        unidade_ids: { type: array, items: { type: string, format: uuid } }
+        setor_ids: { type: array, items: { type: string, format: uuid } }
+    Eu:
+      type: object
+      required: [id, nome, email, perfil, permissoes, escopo, mfa_pendente]
+      properties:
+        id: { type: string, format: uuid }
+        nome: { type: string }
+        email: { type: string }
+        perfil: { $ref: "#/components/schemas/Perfil" }
+        permissoes: { type: array, items: { type: string } }
+        escopo: { $ref: "#/components/schemas/Escopo" }
+        mfa_pendente: { type: boolean }
+
+    EmpresaEntrada:
+      type: object
+      required: [tipo_identificador, identificador, razao_social]
+      properties:
+        tipo_identificador: { type: string, enum: [cnpj, cpf] }
+        identificador: { type: string, pattern: "^[0-9]{11,14}$" }
+        razao_social: { type: string, minLength: 2 }
+    EmpresaAlteracao:
+      type: object
+      properties:
+        razao_social: { type: string }
+        ativo: { type: boolean }
+    Empresa:
+      allOf:
+        - $ref: "#/components/schemas/EmpresaEntrada"
+        - type: object
+          required: [id, ativo]
+          properties:
+            id: { type: string, format: uuid }
+            ativo: { type: boolean }
+
+    EstabelecimentoEntrada:
+      type: object
+      required: [empresa_id, tipo_identificador, identificador, razao_social, endereco]
+      properties:
+        empresa_id: { type: string, format: uuid }
+        tipo_identificador: { $ref: "#/components/schemas/TipoIdentificador" }
+        identificador: { type: string, pattern: "^[0-9]{11,14}$" }
+        razao_social: { type: string }
+        endereco: { $ref: "#/components/schemas/Endereco" }
+    EstabelecimentoAlteracao:
+      type: object
+      properties:
+        razao_social: { type: string }
+        endereco: { $ref: "#/components/schemas/Endereco" }
+        ativo: { type: boolean }
+    Estabelecimento:
+      allOf:
+        - $ref: "#/components/schemas/EstabelecimentoEntrada"
+        - type: object
+          required: [id, ativo, ultimo_nsr]
+          properties:
+            id: { type: string, format: uuid }
+            ativo: { type: boolean }
+            ultimo_nsr: { type: integer }
+
+    UnidadeEntrada:
+      type: object
+      required: [empresa_id, estabelecimento_id, nome, endereco, municipio_ibge]
+      properties:
+        empresa_id: { type: string, format: uuid }
+        estabelecimento_id: { type: string, format: uuid }
+        nome: { type: string }
+        endereco: { $ref: "#/components/schemas/Endereco" }
+        municipio_ibge: { type: string, pattern: "^[0-9]{7}$" }
+    UnidadeAlteracao:
+      type: object
+      properties:
+        nome: { type: string }
+        endereco: { $ref: "#/components/schemas/Endereco" }
+        ativo: { type: boolean }
+        novo_estabelecimento:
+          type: object
+          required: [estabelecimento_id, inicio]
+          properties:
+            estabelecimento_id: { type: string, format: uuid }
+            inicio: { type: string, format: date }
+    Unidade:
+      type: object
+      required: [id, empresa_id, estabelecimento_id, nome, endereco, municipio_ibge, ativo]
+      properties:
+        id: { type: string, format: uuid }
+        empresa_id: { type: string, format: uuid }
+        estabelecimento_id: { type: string, format: uuid, description: "vigente hoje" }
+        nome: { type: string }
+        endereco: { $ref: "#/components/schemas/Endereco" }
+        municipio_ibge: { type: string }
+        ativo: { type: boolean }
+
+    SetorEntrada:
+      type: object
+      required: [unidade_id, nome]
+      properties:
+        unidade_id: { type: string, format: uuid }
+        nome: { type: string }
+    Setor:
+      allOf:
+        - $ref: "#/components/schemas/SetorEntrada"
+        - type: object
+          required: [id, ativo]
+          properties:
+            id: { type: string, format: uuid }
+            ativo: { type: boolean }
+
+    TipoVinculo:
+      type: object
+      required: [id, nome, ativo]
+      properties:
+        id: { type: string, format: uuid }
+        nome: { type: string }
+        ativo: { type: boolean }
+
+    LotacaoEntrada:
+      type: object
+      required: [unidade_id, setor_id, inicio]
+      properties:
+        unidade_id: { type: string, format: uuid }
+        setor_id: { type: string, format: uuid }
+        inicio: { type: string, format: date }
+    Lotacao:
+      allOf:
+        - $ref: "#/components/schemas/LotacaoEntrada"
+        - type: object
+          required: [id, fim, unidade_nome, setor_nome]
+          properties:
+            id: { type: string, format: uuid }
+            fim: { type: [string, "null"], format: date }
+            unidade_nome: { type: string }
+            setor_nome: { type: string }
+
+    LocalPrestacaoEntrada:
+      type: object
+      required: [descricao, endereco, inicio]
+      properties:
+        descricao: { type: string }
+        tomador_tipo_identificador: { type: [string, "null"], enum: [cnpj, cpf, caepf, cno, null] }
+        tomador_identificador: { type: [string, "null"] }
+        endereco: { $ref: "#/components/schemas/Endereco" }
+        inicio: { type: string, format: date }
+        fim: { type: [string, "null"], format: date }
+    LocalPrestacao:
+      allOf:
+        - $ref: "#/components/schemas/LocalPrestacaoEntrada"
+        - type: object
+          required: [id]
+          properties:
+            id: { type: string, format: uuid }
+
+    FuncionarioEntrada:
+      type: object
+      required: [nome, cpf, matricula, admitido_em, tipo_vinculo_id, tipo_registro, lotacao]
+      properties:
+        nome: { type: string, minLength: 3 }
+        cpf: { type: string, pattern: "^[0-9]{11}$" }
+        matricula: { type: string }
+        admitido_em: { type: string, format: date }
+        tipo_vinculo_id: { type: string, format: uuid }
+        tipo_registro: { $ref: "#/components/schemas/TipoRegistro" }
+        email: { type: [string, "null"], format: email }
+        lotacao:
+          type: object
+          required: [unidade_id, setor_id]
+          properties:
+            unidade_id: { type: string, format: uuid }
+            setor_id: { type: string, format: uuid }
+        vinculo_anterior_id: { type: [string, "null"], format: uuid }
+    FuncionarioAlteracao:
+      type: object
+      properties:
+        nome: { type: string }
+        tipo_vinculo_id: { type: string, format: uuid }
+        tipo_registro: { $ref: "#/components/schemas/TipoRegistro" }
+        email: { type: [string, "null"], format: email }
+    FuncionarioResumo:
+      type: object
+      required: [id, nome, cpf_mascarado, matricula, situacao, tipo_registro, unidade_nome, setor_nome]
+      properties:
+        id: { type: string, format: uuid }
+        nome: { type: string }
+        cpf_mascarado: { type: string, examples: ["***.456.789-**"] }
+        matricula: { type: string }
+        situacao: { type: string, enum: [ativo, desligado] }
+        tipo_registro: { $ref: "#/components/schemas/TipoRegistro" }
+        unidade_nome: { type: string }
+        setor_nome: { type: string }
+    Funcionario:
+      type: object
+      required: [id, nome, cpf, matricula, admitido_em, desligado_em, situacao, tipo_vinculo, tipo_registro,
+                 lotacao_atual, lotacoes, locais_prestacao, portal_acesso_ate]
+      properties:
+        id: { type: string, format: uuid }
+        nome: { type: string }
+        cpf: { type: string, description: "Completo para RH/Administrador; mascarado para Gestor" }
+        matricula: { type: string }
+        admitido_em: { type: string, format: date }
+        desligado_em: { type: [string, "null"], format: date }
+        situacao: { type: string, enum: [ativo, desligado] }
+        tipo_vinculo: { $ref: "#/components/schemas/TipoVinculo" }
+        tipo_registro: { $ref: "#/components/schemas/TipoRegistro" }
+        email: { type: [string, "null"] }
+        lotacao_atual: { oneOf: [{ $ref: "#/components/schemas/Lotacao" }, { type: "null" }] }
+        lotacoes: { type: array, items: { $ref: "#/components/schemas/Lotacao" } }
+        locais_prestacao: { type: array, items: { $ref: "#/components/schemas/LocalPrestacao" } }
+        portal_acesso_ate: { type: [string, "null"], format: date, description: "só para desligados" }
+        vinculo_anterior_id: { type: [string, "null"], format: uuid }
+    PaginaFuncionarios:
+      type: object
+      required: [itens, total, pagina, por_pagina]
+      properties:
+        itens: { type: array, items: { $ref: "#/components/schemas/FuncionarioResumo" } }
+        total: { type: integer }
+        pagina: { type: integer }
+        por_pagina: { type: integer }
+
+    FeriadoEntrada:
+      type: object
+      required: [data, nome, abrangencia]
+      properties:
+        data: { type: string, format: date }
+        nome: { type: string }
+        abrangencia: { type: string, enum: [nacional, estadual, municipal, unidade] }
+        uf: { type: [string, "null"], pattern: "^[A-Z]{2}$" }
+        municipio_ibge: { type: [string, "null"], pattern: "^[0-9]{7}$" }
+        unidade_id: { type: [string, "null"], format: uuid }
+    Feriado:
+      allOf:
+        - $ref: "#/components/schemas/FeriadoEntrada"
+        - type: object
+          required: [id, ativo]
+          properties:
+            id: { type: string, format: uuid }
+            ativo: { type: boolean }
+
+    UsuarioEntrada:
+      type: object
+      required: [email, nome, perfil, senha_inicial, escopo]
+      properties:
+        email: { type: string, format: email }
+        nome: { type: string }
+        cpf: { type: [string, "null"], pattern: "^[0-9]{11}$", description: "obrigatório para administrador e rh" }
+        perfil: { $ref: "#/components/schemas/Perfil" }
+        senha_inicial: { type: string, minLength: 10 }
+        escopo: { $ref: "#/components/schemas/Escopo" }
+    UsuarioAlteracao:
+      type: object
+      properties:
+        nome: { type: string }
+        perfil: { $ref: "#/components/schemas/Perfil" }
+        escopo: { $ref: "#/components/schemas/Escopo" }
+        ativo: { type: boolean }
+    Usuario:
+      type: object
+      required: [id, email, nome, perfil, escopo, ativo, mfa_cadastrado]
+      properties:
+        id: { type: string, format: uuid }
+        email: { type: string }
+        nome: { type: string }
+        perfil: { $ref: "#/components/schemas/Perfil" }
+        escopo: { $ref: "#/components/schemas/Escopo" }
+        ativo: { type: boolean }
+        mfa_cadastrado: { type: boolean }
+
+    RegistroAuditoria:
+      type: object
+      required: [id, seq, acao, resultado, ocorrido_em]
+      properties:
+        id: { type: string, format: uuid }
+        seq: { type: integer }
+        usuario_id: { type: [string, "null"], format: uuid }
+        usuario_nome: { type: [string, "null"] }
+        acao: { type: string }
+        objeto_tipo: { type: [string, "null"] }
+        objeto_id: { type: [string, "null"], format: uuid }
+        resultado: { type: string, enum: [permitido, negado] }
+        detalhes: { type: object }
+        ip: { type: [string, "null"] }
+        ocorrido_em: { type: string, format: date-time }
+
+    EventoArp:
+      type: object
+      required: [nsr, tipo, ocorrido_em, responsavel_nome, hash, hash_anterior]
+      properties:
+        nsr: { type: integer }
+        tipo:
+          type: string
+          enum: [empregador_inclusao, empregador_alteracao, empregado_inclusao, empregado_alteracao,
+                 empregado_exclusao]
+        ocorrido_em: { type: string, format: date-time }
+        responsavel_nome: { type: string }
+        resumo: { type: string, description: "Texto sem CPF, ex.: 'Inclusão de empregado: Maria S.'" }
+        hash: { type: string }
+        hash_anterior: { type: string }

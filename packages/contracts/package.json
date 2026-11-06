@@ -1,0 +1,15 @@
+{
+  "name": "@ponto/contracts",
+  "private": true,
+  "version": "0.1.0",
+  "type": "module",
+  "main": "src/index.ts",
+  "types": "src/index.ts",
+  "scripts": {
+    "gen": "openapi-typescript openapi.yaml -o src/schema.d.ts"
+  },
+  "devDependencies": {
+    "openapi-typescript": "^7.4.4",
+    "typescript": "~5.8.3"
+  }
+}
