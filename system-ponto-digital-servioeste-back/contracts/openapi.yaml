@@ -914,16 +914,18 @@ components:
       type: object
       properties:
         nome: { type: string }
+        cpf: { type: [string, "null"], pattern: "^[0-9]{11}$", description: "obrigatório ao promover para administrador ou rh sem CPF" }
         perfil: { $ref: "#/components/schemas/Perfil" }
         escopo: { $ref: "#/components/schemas/Escopo" }
         ativo: { type: boolean }
     Usuario:
       type: object
-      required: [id, email, nome, perfil, escopo, ativo, mfa_cadastrado]
+      required: [id, email, nome, cpf_mascarado, perfil, escopo, ativo, mfa_cadastrado]
       properties:
         id: { type: string, format: uuid }
         email: { type: string }
         nome: { type: string }
+        cpf_mascarado: { type: [string, "null"], examples: ["***.456.789-**"] }
         perfil: { $ref: "#/components/schemas/Perfil" }
         escopo: { $ref: "#/components/schemas/Escopo" }
         ativo: { type: boolean }

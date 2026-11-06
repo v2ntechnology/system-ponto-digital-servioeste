@@ -1647,6 +1647,8 @@ export interface components {
         };
         UsuarioAlteracao: {
             nome?: string;
+            /** @description obrigatório ao promover para administrador ou rh sem CPF */
+            cpf?: string | null;
             perfil?: components["schemas"]["Perfil"];
             escopo?: components["schemas"]["Escopo"];
             ativo?: boolean;
@@ -1656,6 +1658,8 @@ export interface components {
             id: string;
             email: string;
             nome: string;
+            /** @example ***.456.789-** */
+            cpf_mascarado: string | null;
             perfil: components["schemas"]["Perfil"];
             escopo: components["schemas"]["Escopo"];
             ativo: boolean;

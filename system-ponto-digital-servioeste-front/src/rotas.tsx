@@ -1,8 +1,9 @@
-import { CalendarDays, ScrollText, UserCog } from "lucide-react"
+import { CalendarDays } from "lucide-react"
 import { Navigate, type RouteObject } from "react-router-dom"
 
 import { RequirePermissao } from "@/components/layout/RequirePermissao"
 import { RequireAuth } from "@/features/auth/RequireAuth"
+import { AuditoriaPage } from "@/pages/AuditoriaPage"
 import { ConfiguracoesPage } from "@/pages/ConfiguracoesPage"
 import { EmConstrucao } from "@/pages/EmConstrucao"
 import { ErrorPage } from "@/pages/ErrorPage"
@@ -12,6 +13,7 @@ import { FuncionarioPage } from "@/pages/FuncionarioPage"
 import { FuncionariosPage } from "@/pages/FuncionariosPage"
 import { LoginPage } from "@/pages/LoginPage"
 import { MfaPage } from "@/pages/MfaPage"
+import { UsuariosPage } from "@/pages/UsuariosPage"
 
 /**
  * Área de desenvolvimento (/dev): plano, board, histórico, dúvidas do RH e conceitos.
@@ -52,11 +54,11 @@ export const rotas: RouteObject[] = [
       },
       {
         path: "/usuarios",
-        element: <RequirePermissao permissao="usuario.gerenciar"><EmConstrucao titulo="Usuários" icone={UserCog} fase="Fase 5" /></RequirePermissao>,
+        element: <RequirePermissao permissao="usuario.gerenciar"><UsuariosPage /></RequirePermissao>,
       },
       {
         path: "/auditoria",
-        element: <RequirePermissao permissao="auditoria.ler"><EmConstrucao titulo="Auditoria" icone={ScrollText} fase="Fase 5" /></RequirePermissao>,
+        element: <RequirePermissao permissao="auditoria.ler"><AuditoriaPage /></RequirePermissao>,
       },
       { path: "/configuracoes", element: <ConfiguracoesPage /> },
     ],
