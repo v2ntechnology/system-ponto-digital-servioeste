@@ -23,17 +23,20 @@ describe("feriados por unidade", () => {
   it("o municipal aparece só na unidade do município; o nacional aparece para todas", async () => {
     entrarComo("admin@exemplo.test")
     const { user } = renderizarApp("/feriados")
-    await cadastrarMunicipal(user, "Aniversário de Chapecó") // primeiro município da lista: Chapecó (São Cristóvão)
-    expect(await screen.findByText("Aniversário de Chapecó")).toBeInTheDocument()
+    await cadastrarMunicipal(user, "Feriado municipal de teste") // primeiro município da lista: Rio de Janeiro (São Cristóvão)
+    expect(await screen.findByText("Feriado municipal de teste")).toBeInTheDocument()
 
     const filtro = screen.getByLabelText("Ver o calendário de")
     await escolher(user, filtro, "São Cristóvão")
-    expect(await screen.findByText("Aniversário de Chapecó")).toBeInTheDocument()
+    expect(await screen.findByText("Feriado municipal de teste")).toBeInTheDocument()
     expect(screen.getAllByText("Natal").length).toBeGreaterThan(0)
+    expect(screen.getByText("Dia de São Jorge")).toBeInTheDocument() // estadual do RJ
+    expect(screen.getByText("Dia de São Sebastião")).toBeInTheDocument() // municipal do Rio
 
     await escolher(user, filtro, "Unidade Teste") // Xanxerê
     expect(await screen.findAllByText("Natal")).not.toHaveLength(0)
-    expect(screen.queryByText("Aniversário de Chapecó")).not.toBeInTheDocument()
+    expect(screen.queryByText("Feriado municipal de teste")).not.toBeInTheDocument()
+    expect(screen.queryByText("Dia de São Jorge")).not.toBeInTheDocument() // Xanxerê fica em SC
   })
 
   it("RH com escopo de uma unidade só cadastra municipal ou da unidade", async () => {

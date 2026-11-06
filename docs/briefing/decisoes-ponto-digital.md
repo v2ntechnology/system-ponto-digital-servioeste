@@ -15,6 +15,7 @@ Status: **Decidido**, **Provisório** (vale até a validação indicada) ou **Ab
 | D-07 | O sistema gera um arquivo para importação na folha; formato depende de `RH-07` a `RH-09`. | Provisório |
 | D-08 | MVP deve ser desenvolvido sem gastos. Custos inevitáveis estão listados no fim deste arquivo, e a verba em `RH-35`. | Decidido |
 | D-09 | O projeto não tem relação com as outras automações da Servioeste. | Decidido |
+| D-61 | A unidade piloto São Cristóvão fica no Rio de Janeiro/RJ: R. Idalina Senra, 45, Imperial de São Cristóvão, CEP 20941-090 (IBGE 3304557). Valem os feriados estaduais do RJ e os municipais do Rio. | Decidido |
 
 ## Jornada
 

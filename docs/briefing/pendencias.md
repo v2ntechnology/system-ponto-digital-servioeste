@@ -9,7 +9,7 @@ Mesmos códigos do documento `Perguntas para o RH - Ponto Digital.docx`. Anote a
 | RH-01 | Quantos funcionários ativos existem no total, por unidade e em São Cristóvão? | Antes do desenvolvimento | |
 | RH-02 | Em São Cristóvão, quantas pessoas há em cada setor e quantos são motoristas ou equipe externa? | Antes do desenvolvimento | |
 | RH-03 | Cada uma das 18 unidades tem CNPJ próprio? Qual a razão social, o CNPJ e o endereço de cada uma? | Antes do desenvolvimento | |
-| RH-04 | As unidades ficam em cidades diferentes? Quais? | Antes do piloto | |
+| RH-04 | As unidades ficam em cidades diferentes? Quais? | Antes do piloto | Parcial (equipe, 2026-11-06): São Cristóvão fica no Rio de Janeiro/RJ, R. Idalina Senra, 45, Imperial de São Cristóvão, CEP 20941-090. Falta a cidade das outras 17 unidades. |
 | RH-05 | Algum funcionário trabalha em instalações de clientes ou de terceiros? | Antes do piloto | |
 | RH-06 | Estagiários, aprendizes, temporários ou terceirizados também batem ponto? | Antes do piloto | |
 

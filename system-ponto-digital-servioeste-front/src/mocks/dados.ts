@@ -114,8 +114,8 @@ export function hashFicticio(texto: string) {
   return out.slice(0, 64)
 }
 
-const endereco = (logradouro: string, cidade: string, uf: string, cep: string): Endereco => ({
-  logradouro, numero: "100", complemento: null, bairro: "Centro", cidade, uf, cep,
+const endereco = (logradouro: string, numero: string, bairro: string, cidade: string, uf: string, cep: string): Endereco => ({
+  logradouro, numero, complemento: null, bairro, cidade, uf, cep,
 })
 
 // ---------------------------------------------------------------------------------------------------------------
@@ -135,16 +135,17 @@ function bancoInicial(): Banco {
   const estabSc: Estabelecimento = {
     id: idFixo(11), empresa_id: empresa.id, tipo_identificador: "cnpj", identificador: cnpjFicticio(123456, 1),
     razao_social: "Empresa Fictícia de Testes Ltda (São Cristóvão)", ativo: true, ultimo_nsr: 0,
-    endereco: endereco("Rua das Palmeiras", "Chapecó", "SC", "89800000"),
+    // Endereço real da unidade piloto (informado pela equipe em 2026-11-06). Razão social e CNPJ seguem fictícios.
+    endereco: endereco("Rua Idalina Senra", "45", "Imperial de São Cristóvão", "Rio de Janeiro", "RJ", "20941090"),
   }
   const estabTeste: Estabelecimento = {
     id: idFixo(12), empresa_id: empresa.id, tipo_identificador: "cnpj", identificador: cnpjFicticio(123456, 2),
     razao_social: "Empresa Fictícia de Testes Ltda (Filial Teste)", ativo: true, ultimo_nsr: 0,
-    endereco: endereco("Avenida Brasil", "Xanxerê", "SC", "89820000"),
+    endereco: endereco("Avenida Brasil", "100", "Centro", "Xanxerê", "SC", "89820000"),
   }
   const uSc: Unidade = {
     id: idFixo(21), empresa_id: empresa.id, estabelecimento_id: estabSc.id, nome: "São Cristóvão",
-    endereco: estabSc.endereco, municipio_ibge: "4204202", ativo: true,
+    endereco: estabSc.endereco, municipio_ibge: "3304557", ativo: true, // Rio de Janeiro/RJ
   }
   const uTeste: Unidade = {
     id: idFixo(22), empresa_id: empresa.id, estabelecimento_id: estabTeste.id, nome: "Unidade Teste",
@@ -202,6 +203,13 @@ function bancoInicial(): Banco {
       feriados.push({ id: novoId(), data: `${ano}-${md}`, nome, abrangencia: "nacional", uf: null, municipio_ibge: null, unidade_id: null, ativo: true })
     }
   }
+  // Feriados reais do RJ (estadual) e do município do Rio de Janeiro, onde fica São Cristóvão.
+  for (const ano of [2026, 2027]) {
+    feriados.push(
+      { id: novoId(), data: `${ano}-04-23`, nome: "Dia de São Jorge", abrangencia: "estadual", uf: "RJ", municipio_ibge: null, unidade_id: null, ativo: true },
+      { id: novoId(), data: `${ano}-01-20`, nome: "Dia de São Sebastião", abrangencia: "municipal", uf: null, municipio_ibge: "3304557", unidade_id: null, ativo: true },
+    )
+  }
   feriados.push(
     { id: novoId(), data: "2026-04-03", nome: "Paixão de Cristo", abrangencia: "nacional", uf: null, municipio_ibge: null, unidade_id: null, ativo: true },
     { id: novoId(), data: "2027-03-26", nome: "Paixão de Cristo", abrangencia: "nacional", uf: null, municipio_ibge: null, unidade_id: null, ativo: true },
@@ -224,7 +232,8 @@ function bancoInicial(): Banco {
 // ---------------------------------------------------------------------------------------------------------------
 // Persistência na aba (sobrevive a recarregar a página; some ao fechar a aba)
 
-const CHAVE = "ponto-mock-banco"
+// Mudou o banco inicial? Suba a versão: quem tinha os dados antigos na aba recebe os novos sozinho.
+const CHAVE = "ponto-mock-banco-v2"
 
 function carregar(): Banco {
   try {

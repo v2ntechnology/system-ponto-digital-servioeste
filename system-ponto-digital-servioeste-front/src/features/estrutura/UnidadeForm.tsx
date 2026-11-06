@@ -80,10 +80,10 @@ export function UnidadeForm({ empresaId, estabelecimentos, unidade, estabelecime
           <Campo rotulo="Nome da unidade" erro={erro("nome")}>
             {(p) => <Input {...p} required value={nome} onChange={(e) => setNome(e.target.value)} placeholder="Ex.: São Cristóvão" />}
           </Campo>
-          <Campo rotulo="Código IBGE do município" erro={erro("municipio_ibge")} ajuda="7 dígitos. Define os feriados municipais.">
+          <Campo rotulo="Código IBGE do município" erro={erro("municipio_ibge")} ajuda="7 dígitos, do IBGE. Define os feriados municipais.">
             {(p) => (
               <Input {...p} inputMode="numeric" required disabled={!!unidade} value={ibge}
-                onChange={(e) => setIbge(somenteDigitos(e.target.value).slice(0, 7))} placeholder="Ex.: 4204202" />
+                onChange={(e) => setIbge(somenteDigitos(e.target.value).slice(0, 7))} placeholder="Ex.: 3304557 (Rio de Janeiro)" />
             )}
           </Campo>
         </div>

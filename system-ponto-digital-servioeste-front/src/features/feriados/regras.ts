@@ -31,7 +31,7 @@ export const NOME_ABRANGENCIA: Record<FeriadoEntrada["abrangencia"], string> = {
   nacional: "Nacional", estadual: "Estadual", municipal: "Municipal", unidade: "Da unidade",
 }
 
-/** "Estadual · SC", "Municipal · Chapecó/SC", "Da unidade · São Cristóvão" */
+/** "Estadual · RJ", "Municipal · Rio de Janeiro/RJ", "Da unidade · São Cristóvão" */
 export function descreverAbrangencia(f: Pick<Feriado, "abrangencia" | "uf" | "municipio_ibge" | "unidade_id">, unidades: Unidade[]) {
   if (f.abrangencia === "nacional") return "Nacional"
   if (f.abrangencia === "estadual") return `Estadual · ${f.uf}`
