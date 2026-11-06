@@ -23,6 +23,21 @@ security:
   - sessao: []
 
 paths:
+  /health:
+    get:
+      tags: [auth]
+      security: []
+      summary: API e banco no ar
+      responses:
+        "200":
+          description: OK
+          content:
+            application/json:
+              schema:
+                type: object
+                required: [status]
+                properties:
+                  status: { type: string, enum: [ok] }
   /auth/login:
     post:
       tags: [auth]

@@ -1,0 +1,45 @@
+# Ambiente de DESENVOLVIMENTO do Ponto Digital. Rode pela raiz com `make up`
+# (= docker compose -f infra/docker-compose.yml --env-file .env up -d --build).
+#
+# Portas presas em 127.0.0.1 (só este computador acessa) e diferentes do Radar (5432/8000) e do Hub (5433/8001).
+# Dois papéis no banco: ponto_owner (dono, roda as migrações) e ponto_app (a API; sem UPDATE/DELETE no ARP e na
+# auditoria). O papel ponto_app é criado pela migração 0001 com a senha de APP_DB_PASSWORD.
+
+name: servioeste-ponto
+
+services:
+  postgres:
+    image: postgres:16-alpine
+    environment:
+      POSTGRES_USER: ponto_owner
+      POSTGRES_PASSWORD: ${OWNER_DB_PASSWORD:-ponto_owner_dev}
+      POSTGRES_DB: ponto
+      TZ: America/Sao_Paulo
+    ports: ["127.0.0.1:${POSTGRES_PORT:-5434}:5432"]
+    volumes: [pgdata:/var/lib/postgresql/data]
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ponto_owner -d ponto"]
+      interval: 5s
+      retries: 10
+
+  api:
+    build:
+      context: ../system-ponto-digital-servioeste-back
+      args: { DEV: "true" }
+    env_file:
+      - path: ../.env
+        required: false
+    environment:
+      DATABASE_URL: postgresql+asyncpg://ponto_app:${APP_DB_PASSWORD:-ponto_app_dev}@postgres:5432/ponto
+      DATABASE_OWNER_URL: postgresql+asyncpg://ponto_owner:${OWNER_DB_PASSWORD:-ponto_owner_dev}@postgres:5432/ponto
+      PYTHONPATH: /app   # usa o código montado, não a cópia instalada na imagem
+      TZ: America/Sao_Paulo
+    volumes:
+      - ../system-ponto-digital-servioeste-back:/app   # o --reload pega as mudanças na hora
+    command: sh -c "alembic upgrade head && uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload"
+    ports: ["127.0.0.1:${API_PORT:-8002}:8000"]
+    depends_on:
+      postgres: { condition: service_healthy }
+
+volumes:
+  pgdata:

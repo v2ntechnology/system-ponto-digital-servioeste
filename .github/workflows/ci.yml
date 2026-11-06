@@ -32,3 +32,30 @@ jobs:
       - name: Nenhum dado simulado no build de produção
         working-directory: .
         run: ./scripts/check-no-mocks.sh
+
+  back:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: system-ponto-digital-servioeste-back
+    services:
+      postgres:
+        image: postgres:16-alpine
+        env:
+          POSTGRES_USER: ponto_owner
+          POSTGRES_PASSWORD: ponto_owner_ci
+          POSTGRES_DB: ponto
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd "pg_isready -U ponto_owner -d ponto" --health-interval 5s --health-retries 10
+    env:
+      DATABASE_URL: postgresql+asyncpg://ponto_app:ponto_app_ci@localhost:5432/ponto
+      DATABASE_OWNER_URL: postgresql+asyncpg://ponto_owner:ponto_owner_ci@localhost:5432/ponto
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install ".[dev]"
+      - run: ruff check app tests alembic
+      - run: pytest
