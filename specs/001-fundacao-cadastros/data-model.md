@@ -74,6 +74,7 @@ estabelecimento em cada data.
 | tipo_registro | enum `tablet`, `app` | obrigatório (FR-010) |
 | email | text | opcional (portal, feature 008) |
 | vinculo_anterior_id | uuid | FK funcionarios, nulo; preenchido na recontratação |
+| biometria_exclusao_pendente | bool | padrão `false`; `true` no desligamento, consumido pela feature 002 |
 
 Recontratação: novo registro com o mesmo CPF e **nova matrícula** (a matrícula é única por empresa, inclusive
 entre desligados). O histórico fica ligado por `vinculo_anterior_id`.
@@ -170,6 +171,7 @@ Como no Hub: limite por e-mail e IP, em tabela.
 
 ### configuracoes (vigência)
 `chave`, `valor` (jsonb), `inicio`, `fim`. Semente: `portal_dias_pos_desligamento = 1825` (5 anos),
+`sessao_inatividade_min_admin_rh = 30`, `sessao_max_horas = 8`,
 `biometria_dias_pos_desligamento` (definido na feature 002).
 
 ## Registros imutáveis
@@ -195,10 +197,12 @@ transação do evento.
 Gatilho rejeita `UPDATE`/`DELETE`; papel `ponto_app` só tem `INSERT`/`SELECT`.
 
 ### auditoria (só inserção)
-`id`, `seq` (bigserial), `usuario_id` (nulo para anônimo), `acao` (texto, ex.: `funcionario.ver`,
+`id`, `seq` (bigint, atribuído sob trava, sem lacunas), `usuario_id` (nulo para anônimo), `acao` (texto, ex.: `funcionario.ver`,
 `funcionario.criar`, `login.falhou`, `acesso.negado`), `objeto_tipo`, `objeto_id`, `resultado`
 (`permitido`/`negado`), `detalhes` (jsonb, sem CPF em claro), `ip`, `ocorrido_em`, `hash_anterior`, `hash`.
-Mesmo gatilho e permissões do ARP. Encadeamento global por `seq`.
+Mesmo gatilho e permissões do ARP. Encadeamento global por `seq`. Para duas gravações simultâneas não usarem o
+mesmo `hash_anterior`, a gravação pega `pg_advisory_xact_lock` (chave fixa da auditoria), lê a última linha,
+calcula `seq + 1` e o hash, e insere na mesma transação.
 
 ## Relações
 

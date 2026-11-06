@@ -1,6 +1,6 @@
 # Especificação da Feature: Fundação e cadastros
 
-**Feature Branch**: `001-fundacao-cadastros`
+**Branch**: `main` (o projeto trabalha direto na main; a pasta da feature é `specs/001-fundacao-cadastros`)
 
 **Criada em**: 2026-11-06
 
@@ -82,7 +82,8 @@ lista filtrada por unidade e setor e vê a inclusão registrada.
    tipo de registro, **então** o funcionário fica ativo e a inclusão é gravada no registro legal de ponto com
    responsável, data e hora.
 2. **Dado** um CPF já usado por um funcionário ativo, **quando** o RH tenta cadastrá-lo de novo, **então** o
-   sistema recusa e indica o funcionário existente.
+   sistema recusa; se o funcionário existente estiver no escopo do usuário, indica qual é; se estiver fora, mostra
+   apenas "CPF já cadastrado em outra unidade, procure o administrador", sem revelar nome nem unidade.
 3. **Dado** uma matrícula já usada na mesma empresa, **quando** o RH tenta cadastrá-la de novo, **então** o sistema
    recusa e indica o conflito.
 4. **Dado** um CPF inválido (dígitos verificadores errados), **quando** o RH tenta salvar, **então** o sistema
@@ -163,7 +164,8 @@ continuam consultáveis e a exclusão aparece no registro legal de ponto.
    disponíveis e inalteradas.
 3. **Dado** um funcionário desligado, **quando** o desligamento é registrado, **então** seus dados biométricos são
    marcados para exclusão conforme o prazo configurado (executado pela feature 002).
-4. **Dado** um funcionário desligado dentro do prazo de acesso, **quando** ele entra no portal, **então** consegue
+4. *(O bloqueio de acesso ao portal é entregue pela feature 008; esta feature grava e mostra a data-limite.)*
+   **Dado** um funcionário desligado dentro do prazo de acesso, **quando** ele entra no portal, **então** consegue
    apenas consultar e baixar seus comprovantes e espelhos, sem enviar atestados nem registrar ciência.
 5. **Dado** um funcionário desligado cujo prazo de acesso terminou, **quando** ele tenta entrar no portal, **então**
    o acesso é negado com orientação para procurar o RH, e os dados continuam guardados pelo prazo legal.
@@ -191,7 +193,8 @@ continuam consultáveis e a exclusão aparece no registro legal de ponto.
 - Administrador ou RH que perdeu o celular com o app autenticador: outro administrador redefine o segundo fator, com
   auditoria; se for o único administrador, há um procedimento de recuperação documentado fora do painel.
 - Usuário promovido de Gestor para RH: precisa cadastrar o segundo fator no próximo acesso.
-- Data de desligamento anterior à admissão ou no futuro distante: o sistema recusa ou pede confirmação.
+- Data de desligamento anterior à admissão: o sistema recusa. Data até 90 dias no futuro: aceita com confirmação.
+  Data a mais de 90 dias no futuro: o sistema recusa.
 - CPF e outros dados pessoais nunca aparecem em mensagens de erro técnicas ou registros de diagnóstico.
 
 ## Requisitos *(obrigatório)*
@@ -213,8 +216,8 @@ continuam consultáveis e a exclusão aparece no registro legal de ponto.
   como configuração, para permitir ajustes futuros sem mudar o sistema.
 - **FR-007**: O sistema DEVE registrar em trilha de auditoria os acessos a dados pessoais, as ações
   administrativas e as tentativas de acesso negadas, com usuário, data, hora e objeto acessado.
-- **FR-008**: O sistema DEVE manter calendário de feriados com abrangência nacional, estadual ou municipal,
-  aplicado às unidades correspondentes.
+- **FR-008**: O sistema DEVE manter calendário de feriados com abrangência nacional, estadual, municipal ou de uma
+  unidade específica (ponto facultativo local), aplicado às unidades correspondentes.
 - **FR-009**: O sistema DEVE aceitar operação com várias empresas e unidades, mesmo com o piloto em uma só.
 - **FR-010**: O sistema DEVE guardar o tipo de registro de cada funcionário (tablet ou app).
 - **FR-011**: Vínculos do funcionário com unidade, setor e local de prestação DEVEM ter data de início e fim,
@@ -222,17 +225,21 @@ continuam consultáveis e a exclusão aparece no registro legal de ponto.
 - **FR-012**: O gestor DEVE ver apenas funcionários lotados nos setores e/ou unidades inteiras atribuídos a ele pelo
   administrador, em todas as telas, listas, buscas e exportações. Não há atribuição de funcionários avulsos.
 - **FR-012a**: O usuário do RH DEVE ter escopo de unidades atribuído pelo administrador, que pode ser "todas as
-  unidades". Todas as ações do RH (cadastro, consulta, feriados municipais e, nas próximas features, atestados)
-  ficam restritas a esse escopo.
+  unidades". Todas as ações do RH (cadastro, consulta, feriados e, nas próximas features, atestados) ficam restritas
+  a esse escopo: o RH com escopo limitado só cria ou altera feriados municipais dos municípios das suas unidades e
+  feriados das suas unidades; feriados nacionais e estaduais ficam com o Administrador e o RH com "todas as
+  unidades".
 - **FR-013**: O gestor NÃO PODE abrir, visualizar nem baixar atestados.
 - **FR-014**: O sistema DEVE registrar a data de desligamento, impedir que o funcionário apareça como apto a bater
   ponto após essa data e sinalizar seus dados biométricos para o fluxo de exclusão.
 - **FR-014a**: Após o desligamento, o acesso do funcionário ao portal DEVE passar a somente leitura e terminar ao fim
-  de um prazo configurável, com valor inicial de 5 anos. O fim do acesso não apaga dados.
+  de um prazo configurável, com valor inicial de 5 anos. O fim do acesso não apaga dados. Esta feature calcula,
+  grava e exibe a data-limite; a aplicação dela no login do portal é entregue pela feature 008.
 - **FR-015**: Empresas, unidades, setores e funcionários NÃO PODEM ser apagados quando tiverem histórico; apenas
   desativados.
 - **FR-016**: Usuários do painel DEVEM se autenticar com credencial individual (e-mail e senha), com limite de
-  tentativas e encerramento de sessão.
+  tentativas e encerramento de sessão: após 30 minutos sem uso para Administrador e RH, e após 8 horas no máximo
+  para todos os perfis (valores configuráveis).
 - **FR-016a**: Administrador e RH DEVEM usar segundo fator de autenticação obrigatório por app autenticador, sem
   custo de SMS, cadastrado no primeiro acesso. O Gestor entra só com senha. A recuperação de um segundo fator perdido
   é feita por um administrador e fica registrada na auditoria.

@@ -110,11 +110,11 @@ automatizado de imutabilidade) os exigem. O SC-002 exige teste de escopo em toda
 
 **Teste independente**: como `rh@exemplo.test`, cadastrar um funcionário da sede (tablet) e um motorista (app), achá-los pela busca, transferir o motorista de setor e ver o histórico de lotação na ficha.
 
-- [ ] T038 [P] [US2] Criar `apps/web/src/mocks/handlers/funcionarios.ts` para `GET/POST /funcionarios` (busca por nome, CPF ou matrícula; filtros `unidade_id`, `setor_id`, `situacao`, `tipo_registro`; paginação de 50), `GET/PATCH /funcionarios/{id}`, `POST /funcionarios/{id}/lotacoes` e `POST /funcionarios/{id}/locais-prestacao`, aplicando "CPF único entre ativos" (409 `cpf_ja_ativo`), "matrícula única por empresa" (409 `matricula_em_uso`), CPF inválido (400 `cpf_invalido`) e filtro por escopo do usuário (404 fora do escopo)
+- [ ] T038 [P] [US2] Criar `apps/web/src/mocks/handlers/funcionarios.ts` para `GET/POST /funcionarios` (busca por nome, CPF ou matrícula; filtros `unidade_id`, `setor_id`, `situacao`, `tipo_registro`; paginação de 50), `GET/PATCH /funcionarios/{id}`, `POST /funcionarios/{id}/lotacoes` e `POST /funcionarios/{id}/locais-prestacao`, aplicando "CPF único entre ativos" (409 `cpf_ja_ativo`, com `funcionario_id` só se o existente estiver no escopo), "matrícula única por empresa" (409 `matricula_em_uso`), CPF inválido (400 `cpf_invalido`) e filtro por escopo do usuário (404 fora do escopo)
 - [ ] T039 [P] [US2] Criar `apps/web/src/mocks/handlers/tipos-vinculo.ts` para `GET/POST /tipos-vinculo`
 - [ ] T040 [US2] Criar `apps/web/src/features/funcionarios/api.ts` com lista paginada, ficha, criação, alteração, transferência e local de prestação
 - [ ] T041 [US2] Criar `apps/web/src/pages/FuncionariosPage.tsx` com busca (com debounce), filtros por unidade, setor, situação (`ativo`, `desligado`, `todos`) e tipo de registro, tabela com nome, CPF mascarado, matrícula, unidade, setor e tipo de registro, paginação e estados carregando, vazio e erro
-- [ ] T042 [US2] Criar `apps/web/src/features/funcionarios/FuncionarioForm.tsx` com nome (mínimo 3 caracteres), CPF (validação local), matrícula, data de admissão, tipo de vínculo, tipo de registro (`tablet` ou `app`), e-mail opcional e lotação inicial (unidade → setor da unidade); erros 409/400 aparecem no campo correto, e "CPF já ativo" leva ao funcionário existente
+- [ ] T042 [US2] Criar `apps/web/src/features/funcionarios/FuncionarioForm.tsx` com nome (mínimo 3 caracteres), CPF (validação local), matrícula, data de admissão, tipo de vínculo, tipo de registro (`tablet` ou `app`), e-mail opcional e lotação inicial (unidade → setor da unidade); erros 409/400 aparecem no campo correto; "CPF já ativo" leva ao funcionário existente quando a resposta trouxer o id, e senão mostra "CPF já cadastrado em outra unidade, procure o administrador"
 - [ ] T043 [US2] Criar `apps/web/src/pages/FuncionarioNovoPage.tsx` (rota `/funcionarios/novo`) usando o formulário, e voltar para a ficha ao salvar
 - [ ] T044 [US2] Criar `apps/web/src/pages/FuncionarioPage.tsx` com abas Dados, Lotações (histórico com início e fim) e Locais de prestação; CPF completo só com `funcionario.editar` (senão mascarado); edição em diálogo
 - [ ] T045 [US2] Criar `apps/web/src/features/funcionarios/TransferenciaDialog.tsx` (nova unidade, setor e data de início; aviso de que a lotação atual termina no dia anterior)
@@ -150,7 +150,7 @@ automatizado de imutabilidade) os exigem. O SC-002 exige teste de escopo em toda
 
 **Teste independente**: cadastrar um feriado municipal de São Cristóvão e ver que a "Unidade Teste" (em outro município) não o lista.
 
-- [ ] T056 [P] [US4] Criar `apps/web/src/mocks/handlers/feriados.ts` para `GET /feriados?ano=&unidade_id=` (nacionais + estaduais da UF + municipais do município + os da unidade, só ativos), `POST /feriados` (exigir `uf` se `estadual`, `municipio_ibge` se `municipal` e `unidade_id` se `unidade`) e `PATCH /feriados/{id}`
+- [ ] T056 [P] [US4] Criar `apps/web/src/mocks/handlers/feriados.ts` para `GET /feriados?ano=&unidade_id=` (nacionais + estaduais da UF + municipais do município + os da unidade, só ativos), `POST /feriados` (exigir `uf` se `estadual`, `municipio_ibge` se `municipal` e `unidade_id` se `unidade`) e `PATCH /feriados/{id}`, aplicando a mesma regra de escopo do RH da T114
 - [ ] T057 [US4] Criar `apps/web/src/features/feriados/api.ts` e `apps/web/src/features/feriados/FeriadoForm.tsx` (data, nome, abrangência e o campo condicional correspondente)
 - [ ] T058 [US4] Criar `apps/web/src/pages/FeriadosPage.tsx` com o seletor de ano e de unidade ("todas" ou uma), a lista por mês com selo de abrangência, desativar em vez de excluir, protegida por `feriado.editar` para edição
 - [ ] T059 [P] [US4] Criar `apps/web/tests/feriados.test.tsx`: o municipal aparece só para a unidade do município; o nacional aparece para todas
@@ -164,7 +164,7 @@ automatizado de imutabilidade) os exigem. O SC-002 exige teste de escopo em toda
 **Teste independente**: desligar um funcionário, que some de "Ativos", aparece em "Desligados" com "portal até", e a ficha continua abrindo.
 
 - [ ] T060 [P] [US5] Acrescentar `POST /funcionarios/{id}/desligamento` em `apps/web/src/mocks/handlers/funcionarios.ts` (400 se a data for anterior à admissão; preencher `portal_acesso_ate` = data + 1825 dias; gerar evento `empregado_exclusao`) e aceitar `vinculo_anterior_id` no cadastro para recontratação
-- [ ] T061 [US5] Criar `apps/web/src/features/funcionarios/DesligamentoDialog.tsx` (data de desligamento, confirmação explicando que as marcações ficam guardadas e a biometria entra no fluxo de exclusão, aviso se a data estiver a mais de 30 dias no futuro)
+- [ ] T061 [US5] Criar `apps/web/src/features/funcionarios/DesligamentoDialog.tsx` (data de desligamento, confirmação explicando que as marcações ficam guardadas e a biometria entra no fluxo de exclusão, confirmação extra se a data estiver no futuro; data a mais de 90 dias no futuro é recusada)
 - [ ] T062 [US5] Mostrar na `FuncionarioPage.tsx` o selo "Desligado", a data e "acesso ao portal até", e o botão "Recontratar" que abre o `FuncionarioForm` com os dados copiados, nova matrícula e `vinculo_anterior_id`
 - [ ] T063 [P] [US5] Criar `apps/web/tests/desligamento.test.tsx`: desligado sai do filtro "ativo"; recontratação com o mesmo CPF é aceita
 
@@ -201,9 +201,9 @@ automatizado de imutabilidade) os exigem. O SC-002 exige teste de escopo em toda
 
 ### Migração inicial
 
-- [ ] T075 Criar `services/api/alembic/versions/0001_fundacao.py` com as extensões `btree_gist`, `pg_trgm` e `citext`, os papéis `ponto_owner` e `ponto_app`, e todas as tabelas de `data-model.md`: `empresas`, `estabelecimentos`, `unidades`, `unidade_estabelecimentos` (`EXCLUDE USING gist (unidade_id WITH =, daterange(inicio, fim, '[]') WITH &&)`), `setores`, `tipos_vinculo`, `funcionarios` (CPF único com índice parcial `WHERE desligado_em IS NULL`; matrícula única por empresa; `desligado_em >= admitido_em`), `lotacoes` e `locais_prestacao` (com `EXCLUDE` por funcionário), `feriados`, `usuarios`, `usuario_escopos`, `perfil_permissoes`, `sessoes`, `tentativas_login`, `configuracoes`, `nsr_contadores`, `arp_eventos` (`UNIQUE (estabelecimento_id, nsr)`) e `auditoria`
+- [ ] T075 Criar `services/api/alembic/versions/0001_fundacao.py` com as extensões `btree_gist`, `pg_trgm` e `citext`, os papéis `ponto_owner` e `ponto_app`, e todas as tabelas de `data-model.md`: `empresas`, `estabelecimentos`, `unidades`, `unidade_estabelecimentos` (`EXCLUDE USING gist (unidade_id WITH =, daterange(inicio, fim, '[]') WITH &&)`), `setores`, `tipos_vinculo`, `funcionarios` (CPF único com índice parcial `WHERE desligado_em IS NULL`; matrícula única por empresa; `desligado_em >= admitido_em`; `biometria_exclusao_pendente bool default false`), `lotacoes` e `locais_prestacao` (com `EXCLUDE` por funcionário), `feriados`, `usuarios`, `usuario_escopos`, `perfil_permissoes`, `sessoes`, `tentativas_login`, `configuracoes`, `nsr_contadores`, `arp_eventos` (`UNIQUE (estabelecimento_id, nsr)`) e `auditoria`
 - [ ] T076 Na mesma migração, criar o gatilho `BEFORE UPDATE OR DELETE` que lança erro em `arp_eventos` e `auditoria`, dar a `ponto_app` só `INSERT, SELECT` nessas duas tabelas (sem `UPDATE`, `DELETE`, `TRUNCATE`) e criar o índice trigram em `funcionarios.nome`
-- [ ] T077 Na mesma migração, semear `perfil_permissoes` conforme a matriz de `data-model.md`, `tipos_vinculo` (CLT, Estágio, Aprendiz, Temporário) e `configuracoes` (`portal_dias_pos_desligamento = 1825`)
+- [ ] T077 Na mesma migração, semear `perfil_permissoes` conforme a matriz de `data-model.md`, `tipos_vinculo` (CLT, Estágio, Aprendiz, Temporário) e `configuracoes` (`portal_dias_pos_desligamento = 1825`, `sessao_inatividade_min_admin_rh = 30`, `sessao_max_horas = 8`)
 - [ ] T078 [P] Criar os modelos SQLAlchemy em `services/api/app/models/estrutura.py`, `funcionario.py`, `feriado.py`, `usuario.py`, `auditoria.py` e `services/api/app/rep/models.py` (`NsrContador`, `ArpEvento`)
 - [ ] T079 Criar `services/api/tests/conftest.py` com o Postgres de teste (banco novo por sessão, migração aplicada com o papel dono, sessões de teste conectadas como `ponto_app`) e fábricas de empresa, estabelecimento, unidade, setor, funcionário e usuário
 - [ ] T080 Completar o `Makefile` com `up`, `down`, `logs`, `ps`, `test` (pytest no contêiner + `pnpm test:web` + `pnpm build:web`), `lint` (ruff + eslint), `admin` (pede e-mail, nome, CPF e senha) e `admin-reset-mfa`, e acrescentar o job `api` em `.github/workflows/ci.yml` (Postgres como service, ruff, pytest)
@@ -213,20 +213,20 @@ automatizado de imutabilidade) os exigem. O SC-002 exige teste de escopo em toda
 - [ ] T081 [P] Escrever `services/api/tests/arp/test_imutabilidade.py`: `UPDATE` e `DELETE` em `arp_eventos` e `auditoria`, pelo ORM e por SQL direto como `ponto_app`, falham; o gatilho também barra o papel dono (SC-006)
 - [ ] T082 [P] Escrever `services/api/tests/arp/test_nsr.py`: o NSR começa em 1, cresce de 1 em 1 por estabelecimento, é independente entre estabelecimentos e não tem lacunas com 20 gravações concorrentes nem com transação desfeita
 - [ ] T083 [P] Escrever `services/api/tests/arp/test_hash.py`: o primeiro evento tem `hash_anterior` com 64 zeros; cada `hash` = SHA-256(`hash_anterior` + JSON canônico com chaves ordenadas); `verificar_cadeia()` detecta uma linha alterada pelo superusuário com o gatilho desligado
-- [ ] T084 [P] Escrever `services/api/tests/test_auditoria_cadeia.py` com a mesma prova de encadeamento para `auditoria`
+- [ ] T084 [P] Escrever `services/api/tests/test_auditoria_cadeia.py` com a mesma prova de encadeamento para `auditoria`, incluindo 20 gravações simultâneas que precisam terminar com `seq` sem lacunas e a cadeia íntegra
 - [ ] T085 [P] Escrever `services/api/tests/test_logs.py`: uma requisição com CPF no corpo que gera erro não escreve o CPF em nenhum log
 
 ### Implementação
 
 - [ ] T086 Implementar `services/api/app/rep/nsr.py` (`proximo_nsr(sessao, estabelecimento_id)` com `SELECT ... FOR UPDATE` em `nsr_contadores`, na transação de quem chama) até a T082 passar
 - [ ] T087 Implementar `services/api/app/rep/arp.py` (`gravar_evento(sessao, estabelecimento_id, tipo, responsavel, dados)` com JSON canônico, `hash_anterior` do mesmo estabelecimento e `verificar_cadeia(estabelecimento_id)`) até as T081 e T083 passarem
-- [ ] T088 Implementar `services/api/app/services/audit.py` a partir do Hub (`registrar(acao, objeto, resultado, detalhes)` com hash encadeado global, mascarando CPF em `detalhes`) até a T084 passar
+- [ ] T088 Implementar `services/api/app/services/audit.py` a partir do Hub (`registrar(acao, objeto, resultado, detalhes)` com hash encadeado global, mascarando CPF em `detalhes`): pegar `pg_advisory_xact_lock` com a chave fixa da auditoria, ler a última linha, calcular `seq + 1` e o hash e inserir na mesma transação; implementar até a T084 passar
 - [ ] T089 [P] Copiar do Hub `core/security.py` e `services/rate_limit.py` para `services/api/app/core/security.py` e `services/api/app/services/rate_limit.py`
 - [ ] T090 [P] Criar `services/api/app/core/mfa.py` (gerar segredo, URI `otpauth://` com emissor "Servioeste Ponto", cifrar/decifrar com Fernet, validar com janela de ±1 passo, recusar passo `<= mfa_ultimo_passo`)
 - [ ] T091 [P] Criar `services/api/app/services/cpf.py` (validação de CPF e CNPJ por dígito verificador, `mascarar`)
 - [ ] T092 Criar `services/api/app/api/deps.py` a partir do Hub: sessão pelo cookie `ponto_sessao`, checagem de `Origin`, `exige_mfa_concluido` (com `mfa_pendente` só as rotas `/auth/mfa/*`, `/auth/me` e `/auth/logout` respondem) e `exige(permissao)` que registra `acesso.negado` na auditoria e devolve 403
 - [ ] T093 Criar `services/api/app/services/escopo.py` com `filtrar_funcionarios(query, usuario, data)` (lotação vigente cuja unidade ou setor está em `usuario_escopos`; administrador e RH com `todas_unidades` sem filtro) e `garantir_no_escopo(usuario, funcionario_id)` (404 + auditoria `acesso.negado`)
-- [ ] T094 Criar `services/api/app/api/routes/auth.py` a partir do Hub com `POST /auth/login` (resposta `LoginResultado.mfa`), `/auth/logout`, `GET /auth/me` (`Eu` com permissões e escopo) e `POST /auth/senha`
+- [ ] T094 Criar `services/api/app/api/routes/auth.py` a partir do Hub (sessão expira após 30 min sem uso para administrador e RH e após 8 h no máximo para todos, valores em `configuracoes`) com `POST /auth/login` (resposta `LoginResultado.mfa`), `/auth/logout`, `GET /auth/me` (`Eu` com permissões e escopo) e `POST /auth/senha`
 - [ ] T095 Criar `services/api/app/api/routes/mfa.py` com `POST /auth/mfa/cadastro` e `POST /auth/mfa/verificar` (com limite de tentativas)
 - [ ] T096 [P] Escrever `services/api/tests/test_mfa.py`: administrador e RH sem código recebem 401 em `/funcionarios`; código certo libera; o mesmo código usado duas vezes é recusado; gestor não passa por segundo fator
 - [ ] T097 Criar `services/api/app/cli.py` com `create-admin` (e-mail, nome, CPF, senha; cria o administrador com escopo vazio) e `reset-mfa --email`
@@ -238,7 +238,7 @@ automatizado de imutabilidade) os exigem. O SC-002 exige teste de escopo em toda
 
 ## Fase 10: História 1, estrutura da empresa (backend + integração)
 
-- [ ] T099 [P] [US1] Escrever `services/api/tests/test_estrutura.py`: o administrador cria a cadeia e cada criação/alteração gera evento no ARP (`empregador_inclusao` ao criar estabelecimento; `empregador_alteracao` em cada estabelecimento ao alterar a empresa) e linha de auditoria; RH e Gestor recebem 403 e a tentativa é auditada; troca de estabelecimento da unidade fecha a vigência e abre outra sem sobreposição; respostas validadas pelo contrato
+- [ ] T099 [P] [US1] Escrever `services/api/tests/test_estrutura.py`: o administrador cria a cadeia e cada criação/alteração gera evento no ARP (`empregador_inclusao` ao criar estabelecimento; `empregador_alteracao` em cada estabelecimento ao alterar a empresa) e linha de auditoria; RH e Gestor recebem 403 e a tentativa é auditada; troca de estabelecimento da unidade fecha a vigência e abre outra sem sobreposição; uma segunda unidade em outro estabelecimento entra sem mudar nada e tem NSR independente (SC-003); respostas validadas pelo contrato
 - [ ] T100 [US1] Implementar `services/api/app/api/routes/empresas.py` e `estabelecimentos.py` (criar estabelecimento inicia `nsr_contadores` e grava `empregador_inclusao` na mesma transação; desativar em vez de apagar)
 - [ ] T101 [US1] Implementar `services/api/app/api/routes/unidades.py` (GET filtrado pelo escopo; `novo_estabelecimento` fecha a vigência no dia anterior e abre outra) e `setores.py`
 - [ ] T102 [US1] Ligar `apps/web/src/features/estrutura/` à API real, conferir com `make front` sem `VITE_MOCK` e corrigir divergências
@@ -249,9 +249,9 @@ automatizado de imutabilidade) os exigem. O SC-002 exige teste de escopo em toda
 
 ## Fase 11: História 2, cadastro de funcionário (backend + integração)
 
-- [ ] T103 [P] [US2] Escrever `services/api/tests/test_funcionarios.py`: cadastro válido grava `empregado_inclusao` no ARP do estabelecimento da unidade; CPF inválido → 400 `cpf_invalido`; CPF de ativo repetido → 409 `cpf_ja_ativo`; matrícula repetida na empresa → 409 `matricula_em_uso`; alteração grava `empregado_alteracao`; transferência fecha a lotação no dia anterior sem sobreposição; local de prestação com vigência; busca por nome, CPF e matrícula; abrir ficha gera auditoria `funcionario.ver`; respostas validadas pelo contrato
+- [ ] T103 [P] [US2] Escrever `services/api/tests/test_funcionarios.py`: cadastro válido grava `empregado_inclusao` no ARP do estabelecimento da unidade; CPF inválido → 400 `cpf_invalido`; CPF de ativo repetido → 409 `cpf_ja_ativo`; matrícula repetida na empresa → 409 `matricula_em_uso`; alteração grava `empregado_alteracao`; transferência fecha a lotação no dia anterior sem sobreposição; local de prestação com vigência; busca por nome, CPF e matrícula; abrir ficha gera auditoria `funcionario.ver` e listar/buscar gera `funcionario.listar` (sem CPF em `detalhes`); CPF repetido de funcionário fora do escopo devolve 409 sem `funcionario_id`; respostas validadas pelo contrato
 - [ ] T104 [US2] Implementar `services/api/app/api/routes/tipos_vinculo.py`
-- [ ] T105 [US2] Implementar `services/api/app/api/routes/funcionarios.py` com `GET` (sempre via `filtrar_funcionarios`, busca trigram, paginação, CPF mascarado no resumo), `POST` (funcionário + lotação inicial + evento no ARP na mesma transação), `GET/PATCH /{id}` (via `garantir_no_escopo`; CPF completo só com `funcionario.editar`), `POST /{id}/lotacoes` e `POST /{id}/locais-prestacao`
+- [ ] T105 [US2] Implementar `services/api/app/api/routes/funcionarios.py` com `GET` (sempre via `filtrar_funcionarios`, busca trigram, paginação, CPF mascarado no resumo, auditoria `funcionario.listar`), conflito de CPF que só devolve `funcionario_id` quando o existente está no escopo, `POST` (funcionário + lotação inicial + evento no ARP na mesma transação), `GET/PATCH /{id}` (via `garantir_no_escopo`; CPF completo só com `funcionario.editar`), `POST /{id}/lotacoes` e `POST /{id}/locais-prestacao`
 - [ ] T106 [US2] Ligar `apps/web/src/features/funcionarios/` à API real e conferir a busca com 100 funcionários fictícios carregados por `make seed-dev` (alvo novo no `Makefile`, só para dev)
 
 ---
@@ -259,7 +259,7 @@ automatizado de imutabilidade) os exigem. O SC-002 exige teste de escopo em toda
 ## Fase 12: História 3, acesso respeita o perfil (backend + integração)
 
 - [ ] T107 [P] [US3] Escrever `services/api/tests/test_escopo.py`, parametrizado sobre **todas** as rotas de funcionários e estrutura: gestor de outro setor e RH de outra unidade recebem 404/403, a tentativa aparece na auditoria com `resultado = negado`, e a busca nunca devolve funcionário fora do escopo (SC-002)
-- [ ] T108 [P] [US3] Escrever `services/api/tests/test_usuarios.py`: só o administrador gerencia usuários; CPF é obrigatório para administrador e RH; gestor não aceita `todas_unidades`; desativar o último administrador ativo → 409; redefinir o segundo fator apaga o segredo e fica auditado; usuário promovido a RH precisa cadastrar o segundo fator no próximo acesso
+- [ ] T108 [P] [US3] Escrever `services/api/tests/test_usuarios.py`: só o administrador gerencia usuários; CPF é obrigatório para administrador e RH; gestor não aceita `todas_unidades`; desativar o último administrador ativo → 409; redefinir o segundo fator apaga o segredo e fica auditado; usuário promovido a RH precisa cadastrar o segundo fator no próximo acesso e, sem CPF, a promoção é recusada com 400
 - [ ] T109 [US3] Implementar `services/api/app/api/routes/usuarios.py` (CRUD com escopo, redefinir segundo fator)
 - [ ] T110 [US3] Implementar `services/api/app/api/routes/auditoria.py` (`GET /auditoria` com filtros e paginação por `antes_de`) e `services/api/app/api/routes/arp.py` (`GET /arp/eventos` com resumo sem CPF)
 - [ ] T111 [US3] Garantir no código, além da tabela, que o gestor nunca recebe `atestado.abrir` (FR-013), com teste em `services/api/tests/test_permissoes.py`
@@ -269,8 +269,8 @@ automatizado de imutabilidade) os exigem. O SC-002 exige teste de escopo em toda
 
 ## Fase 13: História 4, feriados por unidade (backend + integração)
 
-- [ ] T113 [P] [US4] Escrever `services/api/tests/test_feriados.py`: `GET /feriados?unidade_id=` soma nacionais, estaduais da UF, municipais do município e os da unidade, só ativos; campos condicionais obrigatórios por abrangência; desativar não apaga
-- [ ] T114 [US4] Implementar `services/api/app/api/routes/feriados.py`
+- [ ] T113 [P] [US4] Escrever `services/api/tests/test_feriados.py`: `GET /feriados?unidade_id=` soma nacionais, estaduais da UF, municipais do município e os da unidade, só ativos; campos condicionais obrigatórios por abrangência; desativar não apaga; RH com escopo de uma unidade cria feriado municipal do seu município e da sua unidade, mas recebe 403 em nacional, estadual e municipal de outro município
+- [ ] T114 [US4] Implementar `services/api/app/api/routes/feriados.py`, aplicando o escopo do RH (nacional e estadual só para administrador ou RH com `todas_unidades`; municipal só de municípios das unidades do escopo; `unidade` só de unidades do escopo)
 - [ ] T115 [US4] Ligar `apps/web/src/features/feriados/` à API real
 
 ---
@@ -278,7 +278,7 @@ automatizado de imutabilidade) os exigem. O SC-002 exige teste de escopo em toda
 ## Fase 14: História 5, desligamento (backend + integração)
 
 - [ ] T116 [P] [US5] Escrever `services/api/tests/test_desligamento.py`: o desligamento grava `empregado_exclusao` no ARP e marca `biometria_exclusao_pendente`; o funcionário sai de `situacao=ativo`; `portal_acesso_ate` = data + `portal_dias_pos_desligamento`; data anterior à admissão → 400; a lotação vigente é encerrada na data; recontratação com o mesmo CPF e nova matrícula é aceita e liga `vinculo_anterior_id`; nenhum dado é apagado
-- [ ] T117 [US5] Implementar `POST /funcionarios/{id}/desligamento` em `services/api/app/api/routes/funcionarios.py` e o campo `biometria_exclusao_pendente` (acrescentar à migração 0001 enquanto ela não for aplicada em homologação; depois, migração nova)
+- [ ] T117 [US5] Implementar `POST /funcionarios/{id}/desligamento` em `services/api/app/api/routes/funcionarios.py` (recusa data anterior à admissão ou a mais de 90 dias no futuro; marca `biometria_exclusao_pendente = true`; encerra a lotação vigente; grava `empregado_exclusao` no ARP; tudo na mesma transação)
 - [ ] T118 [US5] Ligar `DesligamentoDialog.tsx` e a recontratação à API real
 
 ---

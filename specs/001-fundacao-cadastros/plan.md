@@ -1,6 +1,6 @@
 # Plano de Implementação: Fundação e cadastros
 
-**Branch**: `001-fundacao-cadastros` | **Data**: 2026-11-06 | **Spec**: [spec.md](spec.md)
+**Branch**: `main` | **Data**: 2026-11-06 | **Spec**: [spec.md](spec.md)
 
 **Entrada**: especificação em `specs/001-fundacao-cadastros/spec.md`, mais `docs/briefing/plano-tecnico.md`,
 `docs/briefing/layout.md`, `docs/briefing/decisoes.md` e `docs/briefing/pendencias.md`.

@@ -80,9 +80,12 @@ Cada item segue o formato Decisão / Motivo / Alternativas. Fontes do projeto: `
 ## R7. Trilha de auditoria
 
 - **Decisão:** tabela `auditoria`, só inserção, com hash encadeado global, gatilho contra alteração e o mesmo
-  bloqueio de permissões do ARP. Registra: usuário, ação, tipo e id do objeto, resultado (`permitido`/`negado`),
+  bloqueio de permissões do ARP. A gravação é serializada com `pg_advisory_xact_lock` antes de ler a última linha,
+  para que gravações simultâneas não usem o mesmo `hash_anterior` (o que quebraria a cadeia e acusaria uma
+  adulteração que não houve). Registra: usuário, ação, tipo e id do objeto, resultado (`permitido`/`negado`),
   data e hora, IP e diferenças (sem CPF em texto: o CPF é mascarado `***.456.789-**`).
-  Leituras de dados pessoais (abrir ficha de funcionário, exportar lista) também geram linha.
+  Leituras de dados pessoais também geram linha: abrir ficha (`funcionario.ver`) e listar/buscar funcionários
+  (`funcionario.listar`, com os filtros usados e sem o texto de busca quando ele for um CPF).
 - **Motivo:** Princípio IV e FR-007; o Hub tem auditoria sem hash, que aqui é ampliada.
 - **Alternativas:** log em arquivo (rejeitada: não é consultável nem encadeado).
 

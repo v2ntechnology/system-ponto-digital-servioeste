@@ -622,6 +622,10 @@ components:
         detail: { type: string, description: "Mensagem em português, sem dados pessoais" }
         campo: { type: [string, "null"] }
         codigo: { type: [string, "null"], examples: [cpf_invalido, cpf_ja_ativo, matricula_em_uso] }
+        funcionario_id:
+          type: [string, "null"]
+          format: uuid
+          description: "Só em cpf_ja_ativo e só quando o funcionário existente está no escopo de quem pediu"
 
     Perfil: { type: string, enum: [administrador, rh, gestor] }
     TipoRegistro: { type: string, enum: [tablet, app] }
