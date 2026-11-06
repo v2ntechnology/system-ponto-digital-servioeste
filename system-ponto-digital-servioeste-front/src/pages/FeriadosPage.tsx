@@ -103,13 +103,16 @@ export function FeriadosPage() {
                     {feriados.map((f) => (
                       <li key={f.id} className={cn("flex items-start gap-3 px-4 py-3", !f.ativo && "opacity-60")}>
                         <div className="w-10 shrink-0 text-center">
-                          <p className="text-lg font-medium leading-none tabular-nums">{f.data.slice(8, 10)}</p>
+                          {/* Como na folhinha: feriado nacional em vermelho. */}
+                          <p className={cn("text-lg font-medium leading-none tabular-nums", f.abrangencia === "nacional" && "text-destructive")}>
+                            {f.data.slice(8, 10)}
+                          </p>
                           <p className="text-xs text-muted-foreground">{diaSemana.format(dataLocal(f.data)).replace(".", "")}</p>
                         </div>
                         <div className="min-w-0 flex-1">
                           <p className={cn("text-sm font-medium", !f.ativo && "line-through")}>{f.nome}</p>
                           <div className="mt-1 flex flex-wrap gap-1.5">
-                            <Badge variant={f.abrangencia === "nacional" ? "outline" : "brand"}>{descreverAbrangencia(f, unidades)}</Badge>
+                            <Badge variant={f.abrangencia === "nacional" ? "destructive" : "brand"}>{descreverAbrangencia(f, unidades)}</Badge>
                             {!f.ativo && <Badge>Inativo</Badge>}
                           </div>
                         </div>
