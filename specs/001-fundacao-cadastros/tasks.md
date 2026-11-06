@@ -63,24 +63,24 @@ automatizado de imutabilidade) os exigem. O SC-002 exige teste de escopo em toda
 
 **⚠️ Nenhuma tela de história começa antes desta fase.**
 
-- [ ] T013 [P] Copiar do Hub `components/ui/button.tsx`, `input.tsx`, `label.tsx` e `avatar.tsx` para `apps/web/src/components/ui/`
-- [ ] T014 [P] Criar no estilo shadcn `new-york` (mesmos tokens) `apps/web/src/components/ui/table.tsx`, `dialog.tsx`, `select.tsx`, `badge.tsx`, `tabs.tsx`, `textarea.tsx`, `checkbox.tsx` e `toast.tsx`
-- [ ] T015 [P] Criar `apps/web/src/components/ui/estados.tsx` com `Carregando`, `Vazio` (ícone, título, ação opcional) e `ErroCarga` (mensagem + "Tentar de novo"), usados em todas as listas
-- [ ] T016 Copiar o `lib/api.ts` do Hub para `apps/web/src/lib/api.ts`, mantendo `api<T>()` e `ApiError`, ler `codigo` e `campo` do schema `Erro` e usar os tipos de `@ponto/contracts` (remover os tipos do Hub)
-- [ ] T017 [P] Criar `apps/web/src/lib/cpf.ts` com `validarCpf` (dígitos verificadores, recusa sequências repetidas), `formatarCpf` (`000.000.000-00`) e `mascararCpf` (`***.456.789-**`), e o teste `apps/web/tests/cpf.test.ts`
-- [ ] T018 [P] Criar `apps/web/src/lib/permissoes.ts` com `pode(eu, permissao)` e o hook `usePermissao`, a partir de `Eu.permissoes`
-- [ ] T019 Criar `apps/web/src/mocks/dados.ts` com o banco simulado em memória: 1 empresa, 1 estabelecimento, unidades "São Cristóvão" e "Unidade Teste", setores "Administrativo" e "Operacional", 12 funcionários fictícios (CPFs válidos de teste, sem foto), 3 tipos de vínculo, feriados nacionais de 2026/2027 e os usuários `admin@exemplo.test`, `rh@exemplo.test` e `gestor@exemplo.test` (escopos do quickstart)
-- [ ] T020 Criar `apps/web/src/mocks/browser.ts` (`setupWorker`) e `apps/web/src/mocks/handlers/index.ts`, com suporte a `?cenario=vazio` e `?cenario=erro` e atraso de 300 ms para mostrar o carregamento
-- [ ] T021 Criar `apps/web/src/mocks/handlers/auth.ts` para `POST /auth/login` (devolve `mfa` = `verificar`, `cadastrar` ou `nao_exigido` conforme o perfil), `POST /auth/logout`, `GET /auth/me`, `POST /auth/senha`, `POST /auth/mfa/cadastro` (URI `otpauth://` fictícia) e `POST /auth/mfa/verificar` (aceita `000000`)
-- [ ] T022 Criar `apps/web/src/main.tsx` como o do Hub (QueryClient, ThemeProvider, Router), iniciando o MSW só quando `import.meta.env.DEV && import.meta.env.VITE_MOCK === "true"`, por `import()` dinâmico; rodar `npx msw init apps/web/public` e ignorar `mockServiceWorker.js` no build de produção
-- [ ] T023 Criar `apps/web/src/features/auth/useAuth.ts` (`useEu`, `useLogin`, `useLogout`, `useVerificarMfa`, `useCadastrarMfa`) com TanStack Query
-- [ ] T024 Copiar e adaptar do Hub `pages/LoginPage.tsx` e `features/auth/LoginVisual.tsx` para `apps/web/src/pages/LoginPage.tsx` e `apps/web/src/features/auth/LoginVisual.tsx` (texto "Servioeste Ponto", sem o clima), redirecionando para `/mfa` quando `mfa != nao_exigido`
-- [ ] T025 Criar `apps/web/src/pages/MfaPage.tsx`: no modo `cadastrar`, mostra o QR (lib `qrcode`) e o campo de 6 dígitos; no modo `verificar`, só o campo; o erro do código aparece no campo
-- [ ] T026 Criar `apps/web/src/features/auth/RequireAuth.tsx` (sem sessão → `/login`; `mfa_pendente` → `/mfa`) e `apps/web/src/components/layout/RequirePermissao.tsx` (sem permissão → página "Sem acesso")
-- [ ] T027 Copiar do Hub `HubShell.tsx`, `TopBar.tsx`, `UserMenu.tsx`, `Brand.tsx` e `ThemeToggle.tsx` para `apps/web/src/components/layout/`, renomeando `HubShell` para `AppShell`, Brand "Servioeste **Ponto**", retirando apps/presença da `TopBar` e montando as pílulas por permissão: Funcionários, Estrutura, Feriados, Usuários, Auditoria
-- [ ] T028 Criar `apps/web/src/App.tsx` com as rotas `/login`, `/mfa`, `/funcionarios`, `/funcionarios/novo`, `/funcionarios/:id`, `/estrutura`, `/feriados`, `/usuarios`, `/auditoria`, `/configuracoes` e `*` (copiar `ErrorPage.tsx` do Hub); `/` redireciona para `/funcionarios`
-- [ ] T029 Copiar do Hub `pages/SettingsPage.tsx` para `apps/web/src/pages/ConfiguracoesPage.tsx`, com tema e troca de senha (sem foto de perfil)
-- [ ] T030 [P] Criar `apps/web/tests/auth.test.tsx`: login de RH vai para `/mfa`, código `000000` libera, gestor entra direto; rota protegida sem sessão volta ao login
+- [X] T013 [P] Copiar do Hub `components/ui/button.tsx`, `input.tsx`, `label.tsx` e `avatar.tsx` para `apps/web/src/components/ui/`
+- [X] T014 [P] Criar no estilo shadcn `new-york` (mesmos tokens) `apps/web/src/components/ui/table.tsx`, `dialog.tsx`, `select.tsx`, `badge.tsx`, `tabs.tsx`, `textarea.tsx`, `checkbox.tsx` e `toast.tsx`
+- [X] T015 [P] Criar `apps/web/src/components/ui/estados.tsx` com `Carregando`, `Vazio` (ícone, título, ação opcional) e `ErroCarga` (mensagem + "Tentar de novo"), usados em todas as listas
+- [X] T016 Copiar o `lib/api.ts` do Hub para `apps/web/src/lib/api.ts`, mantendo `api<T>()` e `ApiError`, ler `codigo` e `campo` do schema `Erro` e usar os tipos de `@ponto/contracts` (remover os tipos do Hub)
+- [X] T017 [P] Criar `apps/web/src/lib/cpf.ts` com `validarCpf` (dígitos verificadores, recusa sequências repetidas), `formatarCpf` (`000.000.000-00`) e `mascararCpf` (`***.456.789-**`), e o teste `apps/web/tests/cpf.test.ts`
+- [X] T018 [P] Criar `apps/web/src/lib/permissoes.ts` com `pode(eu, permissao)` e o hook `usePermissao`, a partir de `Eu.permissoes`
+- [X] T019 Criar `apps/web/src/mocks/dados.ts` com o banco simulado em memória: 1 empresa, 1 estabelecimento, unidades "São Cristóvão" e "Unidade Teste", setores "Administrativo" e "Operacional", 12 funcionários fictícios (CPFs válidos de teste, sem foto), 3 tipos de vínculo, feriados nacionais de 2026/2027 e os usuários `admin@exemplo.test`, `rh@exemplo.test` e `gestor@exemplo.test` (escopos do quickstart)
+- [X] T020 Criar `apps/web/src/mocks/browser.ts` (`setupWorker`) e `apps/web/src/mocks/handlers/index.ts`, com suporte a `?cenario=vazio` e `?cenario=erro` e atraso de 300 ms para mostrar o carregamento
+- [X] T021 Criar `apps/web/src/mocks/handlers/auth.ts` para `POST /auth/login` (devolve `mfa` = `verificar`, `cadastrar` ou `nao_exigido` conforme o perfil), `POST /auth/logout`, `GET /auth/me`, `POST /auth/senha`, `POST /auth/mfa/cadastro` (URI `otpauth://` fictícia) e `POST /auth/mfa/verificar` (aceita `000000`)
+- [X] T022 Criar `apps/web/src/main.tsx` como o do Hub (QueryClient, ThemeProvider, Router), iniciando o MSW só quando `import.meta.env.DEV && import.meta.env.VITE_MOCK === "true"`, por `import()` dinâmico; rodar `npx msw init apps/web/public` e ignorar `mockServiceWorker.js` no build de produção
+- [X] T023 Criar `apps/web/src/features/auth/useAuth.ts` (`useEu`, `useLogin`, `useLogout`, `useVerificarMfa`, `useCadastrarMfa`) com TanStack Query
+- [X] T024 Copiar e adaptar do Hub `pages/LoginPage.tsx` e `features/auth/LoginVisual.tsx` para `apps/web/src/pages/LoginPage.tsx` e `apps/web/src/features/auth/LoginVisual.tsx` (texto "Servioeste Ponto", sem o clima), redirecionando para `/mfa` quando `mfa != nao_exigido`
+- [X] T025 Criar `apps/web/src/pages/MfaPage.tsx`: no modo `cadastrar`, mostra o QR (lib `qrcode`) e o campo de 6 dígitos; no modo `verificar`, só o campo; o erro do código aparece no campo
+- [X] T026 Criar `apps/web/src/features/auth/RequireAuth.tsx` (sem sessão → `/login`; `mfa_pendente` → `/mfa`) e `apps/web/src/components/layout/RequirePermissao.tsx` (sem permissão → página "Sem acesso")
+- [X] T027 Copiar do Hub `HubShell.tsx`, `TopBar.tsx`, `UserMenu.tsx`, `Brand.tsx` e `ThemeToggle.tsx` para `apps/web/src/components/layout/`, renomeando `HubShell` para `AppShell`, Brand "Servioeste **Ponto**", retirando apps/presença da `TopBar` e montando as pílulas por permissão: Funcionários, Estrutura, Feriados, Usuários, Auditoria
+- [X] T028 Criar `apps/web/src/App.tsx` com as rotas `/login`, `/mfa`, `/funcionarios`, `/funcionarios/novo`, `/funcionarios/:id`, `/estrutura`, `/feriados`, `/usuarios`, `/auditoria`, `/configuracoes` e `*` (copiar `ErrorPage.tsx` do Hub); `/` redireciona para `/funcionarios`
+- [X] T029 Copiar do Hub `pages/SettingsPage.tsx` para `apps/web/src/pages/ConfiguracoesPage.tsx`, com tema e troca de senha (sem foto de perfil)
+- [X] T030 [P] Criar `apps/web/tests/auth.test.tsx`: login de RH vai para `/mfa`, código `000000` libera, gestor entra direto; rota protegida sem sessão volta ao login
 
 **Ponto de controle**: com `make front-mock`, os três usuários simulados entram, o RH e o administrador passam pelo segundo fator e a barra do topo mostra só as pílulas permitidas.
 

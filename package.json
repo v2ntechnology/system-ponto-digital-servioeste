@@ -3,6 +3,8 @@
   "private": true,
   "packageManager": "pnpm@9.15.0",
   "scripts": {
+    "dev": "pnpm --filter web dev",
+    "dev:mock": "VITE_MOCK=true pnpm --filter web dev",
     "contracts": "pnpm --filter @ponto/contracts gen",
     "dev:web": "pnpm --filter web dev",
     "build:web": "pnpm --filter web build",

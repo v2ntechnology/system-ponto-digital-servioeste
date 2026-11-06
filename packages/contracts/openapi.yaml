@@ -941,7 +941,7 @@ components:
         objeto_tipo: { type: [string, "null"] }
         objeto_id: { type: [string, "null"], format: uuid }
         resultado: { type: string, enum: [permitido, negado] }
-        detalhes: { type: object }
+        detalhes: { type: object, additionalProperties: true, description: "Sem CPF em claro" }
         ip: { type: [string, "null"] }
         ocorrido_em: { type: string, format: date-time }
 

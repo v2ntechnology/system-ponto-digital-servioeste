@@ -1674,7 +1674,10 @@ export interface components {
             objeto_id?: string | null;
             /** @enum {string} */
             resultado: "permitido" | "negado";
-            detalhes?: Record<string, never>;
+            /** @description Sem CPF em claro */
+            detalhes?: {
+                [key: string]: unknown;
+            };
             ip?: string | null;
             /** Format: date-time */
             ocorrido_em: string;

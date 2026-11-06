@@ -25,4 +25,6 @@ export default tseslint.config(
       ],
     },
   },
+  // Arquivos de teste não passam pelo fast refresh do Vite.
+  { files: ['tests/**/*.{ts,tsx}'], rules: { 'react-refresh/only-export-components': 'off' } },
 )

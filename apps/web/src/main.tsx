@@ -5,22 +5,28 @@ import "./index.css"
 import { StrictMode } from "react"
 import { createRoot } from "react-dom/client"
 
-import { ThemeProvider } from "@/lib/theme"
+import { App } from "@/App"
+import { Providers } from "@/Providers"
 
-// Esqueleto da Fase 1. A Fase 2 acrescenta rotas, TanStack Query e o MSW (só em dev com VITE_MOCK=true).
-createRoot(document.getElementById("root")!).render(
-  <StrictMode>
-    <ThemeProvider>
-      <main className="grid min-h-dvh place-items-center bg-background p-4 text-foreground">
-        <div className="flex items-center gap-2.5">
-          <span className="grid size-9 place-items-center rounded-xl border bg-background">
-            <img src="/favicon.svg" alt="" className="size-5" />
-          </span>
-          <span className="text-[15px] font-medium tracking-tight">
-            Servioeste <span className="text-muted-foreground">Ponto</span>
-          </span>
-        </div>
-      </main>
-    </ThemeProvider>
-  </StrictMode>,
-)
+/**
+ * Dados simulados (Princípio XII): só em desenvolvimento e só com VITE_MOCK=true.
+ * No build de produção `import.meta.env.DEV` vira `false`, o bloco some e o código do MSW não entra no pacote
+ * (conferido por `make check-no-mocks`).
+ */
+async function iniciarDadosSimulados() {
+  if (import.meta.env.DEV && import.meta.env.VITE_MOCK === "true") {
+    const { worker } = await import("./mocks/browser")
+    await worker.start({ onUnhandledRequest: "bypass", quiet: true })
+    console.info("[Ponto] Dados simulados ligados (VITE_MOCK=true).")
+  }
+}
+
+iniciarDadosSimulados().then(() => {
+  createRoot(document.getElementById("root")!).render(
+    <StrictMode>
+      <Providers>
+        <App />
+      </Providers>
+    </StrictMode>,
+  )
+})

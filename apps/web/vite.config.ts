@@ -1,11 +1,31 @@
 /// <reference types="vitest/config" />
+import { readFileSync } from "node:fs"
 import path from "node:path"
 import tailwindcss from "@tailwindcss/vite"
 import react from "@vitejs/plugin-react"
-import { defineConfig } from "vite"
+import { defineConfig, type Plugin } from "vite"
+
+/**
+ * Serve o service worker do MSW só no servidor de desenvolvimento, direto do node_modules.
+ * Assim o arquivo nunca fica em public/ e nunca vai para o build de produção (Princípio XII).
+ */
+function mswSoEmDev(): Plugin {
+  const arquivo = path.resolve(__dirname, "node_modules/msw/lib/mockServiceWorker.js")
+  return {
+    name: "msw-so-em-dev",
+    apply: "serve",
+    configureServer(server) {
+      server.middlewares.use("/mockServiceWorker.js", (_req, res) => {
+        res.setHeader("Content-Type", "application/javascript")
+        res.setHeader("Service-Worker-Allowed", "/")
+        res.end(readFileSync(arquivo))
+      })
+    },
+  }
+}
 
 export default defineConfig({
-  plugins: [react(), tailwindcss()],
+  plugins: [react(), tailwindcss(), mswSoEmDev()],
   resolve: {
     alias: { "@": path.resolve(__dirname, "./src") },
   },
