@@ -150,10 +150,10 @@ automatizado de imutabilidade) os exigem. O SC-002 exige teste de escopo em toda
 
 **Teste independente**: cadastrar um feriado municipal de São Cristóvão e ver que a "Unidade Teste" (em outro município) não o lista.
 
-- [ ] T056 [P] [US4] Criar `system-ponto-digital-servioeste-front/src/mocks/handlers/feriados.ts` para `GET /feriados?ano=&unidade_id=` (nacionais + estaduais da UF + municipais do município + os da unidade, só ativos), `POST /feriados` (exigir `uf` se `estadual`, `municipio_ibge` se `municipal` e `unidade_id` se `unidade`) e `PATCH /feriados/{id}`, aplicando a mesma regra de escopo do RH da T114
-- [ ] T057 [US4] Criar `system-ponto-digital-servioeste-front/src/features/feriados/api.ts` e `system-ponto-digital-servioeste-front/src/features/feriados/FeriadoForm.tsx` (data, nome, abrangência e o campo condicional correspondente)
-- [ ] T058 [US4] Criar `system-ponto-digital-servioeste-front/src/pages/FeriadosPage.tsx` com o seletor de ano e de unidade ("todas" ou uma), a lista por mês com selo de abrangência, desativar em vez de excluir, protegida por `feriado.editar` para edição
-- [ ] T059 [P] [US4] Criar `system-ponto-digital-servioeste-front/tests/feriados.test.tsx`: o municipal aparece só para a unidade do município; o nacional aparece para todas
+- [X] T056 [P] [US4] Criar `system-ponto-digital-servioeste-front/src/mocks/handlers/feriados.ts` para `GET /feriados?ano=&unidade_id=` (nacionais + estaduais da UF + municipais do município + os da unidade, só ativos), `POST /feriados` (exigir `uf` se `estadual`, `municipio_ibge` se `municipal` e `unidade_id` se `unidade`) e `PATCH /feriados/{id}`, aplicando a mesma regra de escopo do RH da T114
+- [X] T057 [US4] Criar `system-ponto-digital-servioeste-front/src/features/feriados/api.ts` e `system-ponto-digital-servioeste-front/src/features/feriados/FeriadoForm.tsx` (data, nome, abrangência e o campo condicional correspondente)
+- [X] T058 [US4] Criar `system-ponto-digital-servioeste-front/src/pages/FeriadosPage.tsx` com o seletor de ano e de unidade ("todas" ou uma), a lista por mês com selo de abrangência, desativar em vez de excluir, protegida por `feriado.editar` para edição
+- [X] T059 [P] [US4] Criar `system-ponto-digital-servioeste-front/tests/feriados.test.tsx`: o municipal aparece só para a unidade do município; o nacional aparece para todas
 
 ---
 

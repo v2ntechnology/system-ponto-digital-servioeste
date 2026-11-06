@@ -1,13 +1,12 @@
-import { CalendarDays } from "lucide-react"
 import { Navigate, type RouteObject } from "react-router-dom"
 
 import { RequirePermissao } from "@/components/layout/RequirePermissao"
 import { RequireAuth } from "@/features/auth/RequireAuth"
 import { AuditoriaPage } from "@/pages/AuditoriaPage"
 import { ConfiguracoesPage } from "@/pages/ConfiguracoesPage"
-import { EmConstrucao } from "@/pages/EmConstrucao"
 import { ErrorPage } from "@/pages/ErrorPage"
 import { EstruturaPage } from "@/pages/EstruturaPage"
+import { FeriadosPage } from "@/pages/FeriadosPage"
 import { FuncionarioNovoPage } from "@/pages/FuncionarioNovoPage"
 import { FuncionarioPage } from "@/pages/FuncionarioPage"
 import { FuncionariosPage } from "@/pages/FuncionariosPage"
@@ -50,7 +49,7 @@ export const rotas: RouteObject[] = [
       },
       {
         path: "/feriados",
-        element: <RequirePermissao permissao="estrutura.ler"><EmConstrucao titulo="Feriados" icone={CalendarDays} fase="Fase 6" /></RequirePermissao>,
+        element: <RequirePermissao permissao="estrutura.ler"><FeriadosPage /></RequirePermissao>,
       },
       {
         path: "/usuarios",
