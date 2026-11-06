@@ -1,4 +1,4 @@
-import { Building2, CalendarDays, ScrollText, UserCog, Users } from "lucide-react"
+import { CalendarDays, ScrollText, UserCog, Users } from "lucide-react"
 import { Navigate, type RouteObject } from "react-router-dom"
 
 import { RequirePermissao } from "@/components/layout/RequirePermissao"
@@ -6,6 +6,7 @@ import { RequireAuth } from "@/features/auth/RequireAuth"
 import { ConfiguracoesPage } from "@/pages/ConfiguracoesPage"
 import { EmConstrucao } from "@/pages/EmConstrucao"
 import { ErrorPage } from "@/pages/ErrorPage"
+import { EstruturaPage } from "@/pages/EstruturaPage"
 import { LoginPage } from "@/pages/LoginPage"
 import { MfaPage } from "@/pages/MfaPage"
 
@@ -32,7 +33,7 @@ export const rotas: RouteObject[] = [
       },
       {
         path: "/estrutura",
-        element: <RequirePermissao permissao="estrutura.ler"><EmConstrucao titulo="Estrutura" icone={Building2} fase="Fase 3" /></RequirePermissao>,
+        element: <RequirePermissao permissao="estrutura.ler"><EstruturaPage /></RequirePermissao>,
       },
       {
         path: "/feriados",
