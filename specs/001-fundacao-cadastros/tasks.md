@@ -174,9 +174,9 @@ automatizado de imutabilidade) os exigem. O SC-002 exige teste de escopo em toda
 
 **Objetivo**: as duas pessoas da equipe revisam os fluxos antes de começar o backend (passo 3 do plano técnico).
 
-- [ ] T064 Percorrer o roteiro da Etapa A de `specs/001-fundacao-cadastros/quickstart.md` (itens 1 a 8), incluindo tema claro/escuro e largura de 375 px, e registrar os ajustes em `specs/001-fundacao-cadastros/validacao-frontend.md`
-- [ ] T065 Aplicar os ajustes aprovados; se algum mudar o contrato, atualizar `system-ponto-digital-servioeste-back/contracts/openapi.yaml` e `specs/001-fundacao-cadastros/contracts/openapi.yaml` juntos e regerar os tipos
-- [ ] T066 Rodar `make build-front && make check-no-mocks` e confirmar que o build de produção não tem nada simulado
+- [X] T064 Percorrer o roteiro da Etapa A de `specs/001-fundacao-cadastros/quickstart.md` (itens 1 a 8), incluindo tema claro/escuro e largura de 375 px, e registrar os ajustes em `specs/001-fundacao-cadastros/validacao-frontend.md`
+- [X] T065 Aplicar os ajustes aprovados; se algum mudar o contrato, atualizar `system-ponto-digital-servioeste-back/contracts/openapi.yaml` e `specs/001-fundacao-cadastros/contracts/openapi.yaml` juntos e regerar os tipos
+- [X] T066 Rodar `make build-front && make check-no-mocks` e confirmar que o build de produção não tem nada simulado
 
 **Ponto de controle**: telas aprovadas pela equipe. Só então começa a Parte B.
 
