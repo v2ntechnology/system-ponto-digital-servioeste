@@ -56,3 +56,6 @@ export const useTransferir = () =>
   useMutacao(({ id, ...b }: LotacaoEntrada & { id: string }) => post<Lotacao>(`/funcionarios/${id}/lotacoes`, b))
 export const useAdicionarLocal = () =>
   useMutacao(({ id, ...b }: LocalPrestacaoEntrada & { id: string }) => post<LocalPrestacao>(`/funcionarios/${id}/locais-prestacao`, b))
+export const useDesligar = () =>
+  useMutacao(({ id, desligado_em }: { id: string; desligado_em: string }) =>
+    post<Funcionario>(`/funcionarios/${id}/desligamento`, { desligado_em }))

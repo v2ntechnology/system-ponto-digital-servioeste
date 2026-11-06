@@ -12,12 +12,16 @@ import { mascararCpf, somenteDigitos, validarCpf } from "@/lib/cpf"
 import { addDays } from "@/lib/format"
 
 import {
-  db, estabelecimentoDoFuncionario, funcionarioNoEscopo, lotacaoVigente, nomeCurto, novoId, PERMISSOES,
+  db, estabelecimentoDoFuncionario, funcionarioNoEscopo, hojeIso, lotacaoVigente, nomeCurto, novoId, PERMISSOES,
   registrarArp, registrarAuditoria, salvar, type FuncionarioDb, type LotacaoDb, type UsuarioDb,
 } from "../dados"
 import { API, cenario, erro, esperar, exigirPermissao } from "../util"
 
 const DIAS_PORTAL = 1825
+const MAX_DIAS_FUTURO_DESLIGAMENTO = 90
+
+/** Desligado de fato: a data já passou (no próprio dia do desligamento a pessoa ainda trabalha). */
+const estaDesligado = (f: FuncionarioDb) => f.desligado_em !== null && f.desligado_em < hojeIso()
 
 const semAcento = (s: string) => s.normalize("NFD").replace(/[̀-ͯ]/g, "").toLowerCase()
 const podeEditar = (u: UsuarioDb) => PERMISSOES[u.perfil].includes("funcionario.editar")
@@ -38,7 +42,7 @@ function resumo(f: FuncionarioDb): FuncionarioResumo {
   const lot = lotacaoVigente(db, f.id)
   return {
     id: f.id, nome: f.nome, cpf_mascarado: mascararCpf(f.cpf), matricula: f.matricula,
-    situacao: f.desligado_em ? "desligado" : "ativo", tipo_registro: f.tipo_registro,
+    situacao: estaDesligado(f) ? "desligado" : "ativo", tipo_registro: f.tipo_registro,
     unidade_nome: db.unidades.find((u) => u.id === lot?.unidade_id)?.nome ?? "—",
     setor_nome: db.setores.find((s) => s.id === lot?.setor_id)?.nome ?? "—",
   }
@@ -46,10 +50,10 @@ function resumo(f: FuncionarioDb): FuncionarioResumo {
 
 export function fichaCompleta(f: FuncionarioDb, u: UsuarioDb): Funcionario {
   const lots = db.lotacoes.filter((l) => l.funcionario_id === f.id).sort((a, b) => b.inicio.localeCompare(a.inicio))
-  const atual = f.desligado_em ? undefined : lotacaoVigente(db, f.id)
+  const atual = estaDesligado(f) ? undefined : lotacaoVigente(db, f.id)
   return {
     id: f.id, nome: f.nome, cpf: podeEditar(u) ? f.cpf : mascararCpf(f.cpf), matricula: f.matricula,
-    admitido_em: f.admitido_em, desligado_em: f.desligado_em, situacao: f.desligado_em ? "desligado" : "ativo",
+    admitido_em: f.admitido_em, desligado_em: f.desligado_em, situacao: estaDesligado(f) ? "desligado" : "ativo",
     tipo_vinculo: db.tiposVinculo.find((t) => t.id === f.tipo_vinculo_id)!, tipo_registro: f.tipo_registro,
     email: f.email, lotacao_atual: atual ? lotacaoContrato(atual) : null, lotacoes: lots.map(lotacaoContrato),
     locais_prestacao: db.locais.filter((l) => l.funcionario_id === f.id).map((l) => {
@@ -111,7 +115,7 @@ export const funcionariosHandlers = [
     const digitos = somenteDigitos(busca)
     const texto = semAcento(busca)
     let lista = db.funcionarios.filter((f) => funcionarioNoEscopo(db, r.usuario, f.id))
-    if (situacao !== "todos") lista = lista.filter((f) => (situacao === "desligado" ? !!f.desligado_em : !f.desligado_em))
+    if (situacao !== "todos") lista = lista.filter((f) => (situacao === "desligado" ? estaDesligado(f) : !estaDesligado(f)))
     if (q.get("tipo_registro")) lista = lista.filter((f) => f.tipo_registro === q.get("tipo_registro"))
     if (q.get("unidade_id")) lista = lista.filter((f) => lotacaoVigente(db, f.id)?.unidade_id === q.get("unidade_id"))
     if (q.get("setor_id")) lista = lista.filter((f) => lotacaoVigente(db, f.id)?.setor_id === q.get("setor_id"))
@@ -159,6 +163,15 @@ export const funcionariosHandlers = [
       return erro(403, "Você não pode cadastrar funcionários nesta unidade.", { campo: "unidade_id" })
     }
 
+    if (corpo.vinculo_anterior_id) {
+      const anterior = db.funcionarios.find((f) => f.id === corpo.vinculo_anterior_id)
+      if (!anterior || anterior.cpf !== cpf || !estaDesligado(anterior)) {
+        return erro(400, "O vínculo anterior precisa ser um desligamento já efetivado do mesmo CPF.", { campo: "cpf" })
+      }
+      if (corpo.admitido_em <= anterior.desligado_em!) {
+        return erro(400, "A nova admissão precisa ser depois do desligamento anterior.", { campo: "admitido_em" })
+      }
+    }
     const existente = db.funcionarios.find((f) => f.cpf === cpf && !f.desligado_em)
     if (existente) {
       // Só revela qual é o funcionário se ele estiver no escopo de quem está cadastrando.
@@ -227,7 +240,7 @@ export const funcionariosHandlers = [
     if ("resposta" in r) return r.resposta
     const f = funcionarioVisivel(r.usuario, String(params.id), "funcionario.transferir")
     if (!f) return erro(404, "Funcionário não encontrado.")
-    if (f.desligado_em) return erro(400, "Funcionário desligado não pode ser transferido.")
+    if (f.desligado_em) return erro(400, "Funcionário com desligamento registrado não pode ser transferido.")
     const corpo = (await request.json()) as LotacaoEntrada
     const unidade = db.unidades.find((u) => u.id === corpo.unidade_id)
     const setor = db.setores.find((s) => s.id === corpo.setor_id)
@@ -254,6 +267,35 @@ export const funcionariosHandlers = [
     registrarAuditoria(db, r.usuario, "funcionario.transferir", "permitido", { tipo: "funcionario", id: f.id }, { inicio: corpo.inicio })
     salvar()
     return HttpResponse.json(lotacaoContrato(nova), { status: 201 })
+  }),
+
+  // ---------------- Desligamento (FR-014, FR-014a) ----------------
+  http.post(`${API}/funcionarios/:id/desligamento`, async ({ request, params }) => {
+    await esperar()
+    const r = exigirPermissao("funcionario.desligar", "funcionario.desligar")
+    if ("resposta" in r) return r.resposta
+    const f = funcionarioVisivel(r.usuario, String(params.id), "funcionario.desligar")
+    if (!f) return erro(404, "Funcionário não encontrado.")
+    if (f.desligado_em) return erro(400, "O desligamento deste funcionário já foi registrado.")
+    const { desligado_em } = (await request.json()) as { desligado_em: string }
+    if (!desligado_em) return erro(400, "Informe a data do desligamento.", { campo: "desligado_em" })
+    if (desligado_em < f.admitido_em) return erro(400, "O desligamento não pode ser antes da admissão.", { campo: "desligado_em" })
+    if (desligado_em > addDays(hojeIso(), MAX_DIAS_FUTURO_DESLIGAMENTO)) {
+      return erro(400, `A data pode ser no máximo ${MAX_DIAS_FUTURO_DESLIGAMENTO} dias à frente.`, { campo: "desligado_em" })
+    }
+    const lot = lotacaoVigente(db, f.id)
+    if (lot && desligado_em < lot.inicio) return erro(400, "O desligamento não pode ser antes do início da lotação atual.", { campo: "desligado_em" })
+
+    const estabelecimento = estabelecimentoDoFuncionario(db, f.id)!
+    f.desligado_em = desligado_em
+    // Fluxo de exclusão da biometria (executado pela feature 002, no prazo configurado).
+    f.biometria_exclusao_pendente = true
+    if (lot && lot.fim === null) lot.fim = desligado_em
+    // Nada é apagado: o empregado sai da sequência do estabelecimento com um evento de exclusão no ARP.
+    registrarArp(db, estabelecimento, "empregado_exclusao", r.usuario, `Exclusão de empregado (desligamento): ${nomeCurto(f.nome)}`)
+    registrarAuditoria(db, r.usuario, "funcionario.desligar", "permitido", { tipo: "funcionario", id: f.id }, { desligado_em })
+    salvar()
+    return HttpResponse.json(fichaCompleta(f, r.usuario))
   }),
 
   // ---------------- Local de prestação (FR-005) ----------------

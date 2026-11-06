@@ -163,10 +163,10 @@ automatizado de imutabilidade) os exigem. O SC-002 exige teste de escopo em toda
 
 **Teste independente**: desligar um funcionário, que some de "Ativos", aparece em "Desligados" com "portal até", e a ficha continua abrindo.
 
-- [ ] T060 [P] [US5] Acrescentar `POST /funcionarios/{id}/desligamento` em `system-ponto-digital-servioeste-front/src/mocks/handlers/funcionarios.ts` (400 se a data for anterior à admissão; preencher `portal_acesso_ate` = data + 1825 dias; gerar evento `empregado_exclusao`) e aceitar `vinculo_anterior_id` no cadastro para recontratação
-- [ ] T061 [US5] Criar `system-ponto-digital-servioeste-front/src/features/funcionarios/DesligamentoDialog.tsx` (data de desligamento, confirmação explicando que as marcações ficam guardadas e a biometria entra no fluxo de exclusão, confirmação extra se a data estiver no futuro; data a mais de 90 dias no futuro é recusada)
-- [ ] T062 [US5] Mostrar na `FuncionarioPage.tsx` o selo "Desligado", a data e "acesso ao portal até", e o botão "Recontratar" que abre o `FuncionarioForm` com os dados copiados, nova matrícula e `vinculo_anterior_id`
-- [ ] T063 [P] [US5] Criar `system-ponto-digital-servioeste-front/tests/desligamento.test.tsx`: desligado sai do filtro "ativo"; recontratação com o mesmo CPF é aceita
+- [X] T060 [P] [US5] Acrescentar `POST /funcionarios/{id}/desligamento` em `system-ponto-digital-servioeste-front/src/mocks/handlers/funcionarios.ts` (400 se a data for anterior à admissão; preencher `portal_acesso_ate` = data + 1825 dias; gerar evento `empregado_exclusao`) e aceitar `vinculo_anterior_id` no cadastro para recontratação
+- [X] T061 [US5] Criar `system-ponto-digital-servioeste-front/src/features/funcionarios/DesligamentoDialog.tsx` (data de desligamento, confirmação explicando que as marcações ficam guardadas e a biometria entra no fluxo de exclusão, confirmação extra se a data estiver no futuro; data a mais de 90 dias no futuro é recusada)
+- [X] T062 [US5] Mostrar na `FuncionarioPage.tsx` o selo "Desligado", a data e "acesso ao portal até", e o botão "Recontratar" que abre o `FuncionarioForm` com os dados copiados, nova matrícula e `vinculo_anterior_id`
+- [X] T063 [P] [US5] Criar `system-ponto-digital-servioeste-front/tests/desligamento.test.tsx`: desligado sai do filtro "ativo"; recontratação com o mesmo CPF é aceita
 
 ---
 
