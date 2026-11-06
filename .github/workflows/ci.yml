@@ -19,9 +19,9 @@ jobs:
       - name: Contrato e tipos gerados estão em dia
         run: |
           pnpm contracts
-          git diff --exit-code packages/contracts/src/schema.d.ts
-      - run: pnpm lint:web
-      - run: pnpm test:web
-      - run: pnpm build:web
+          git diff --exit-code system-ponto-digital-servioeste-back/contracts/src/schema.d.ts
+      - run: pnpm lint:front
+      - run: pnpm test:front
+      - run: pnpm build:front
       - name: Nenhum dado simulado no build de produção
         run: ./scripts/check-no-mocks.sh

@@ -12,9 +12,9 @@ Guia de validação. Os detalhes de dados estão em [data-model.md](data-model.m
 ## Etapa A: frontend com dados simulados (antes do backend)
 
 ```bash
-make install           # pnpm install no workspace (apps/web + packages/contracts)
+make install           # pnpm install no workspace (system-ponto-digital-servioeste-front + system-ponto-digital-servioeste-back/contracts)
 make contracts         # gera os tipos TypeScript a partir do openapi.yaml
-make front-mock        # VITE_MOCK=true pnpm --filter web dev -> http://localhost:5175
+make front-mock        # VITE_MOCK=true pnpm --filter front dev -> http://localhost:5175
 ```
 
 Usuários simulados (senha `senha-de-teste`, código MFA simulado `000000`):
@@ -43,8 +43,8 @@ Roteiro de validação com a equipe (Princípio XII):
 Garantia de que o simulado não vai para produção:
 
 ```bash
-make build-web         # build de produção
-make check-no-mocks    # falha se "msw" ou "mockServiceWorker" estiverem em apps/web/dist
+make build-front         # build de produção
+make check-no-mocks    # falha se "msw" ou "mockServiceWorker" estiverem em system-ponto-digital-servioeste-front/dist
 ```
 
 ## Etapa B: backend
@@ -67,7 +67,7 @@ Testes que precisam passar (escritos antes do código, Princípio IX):
 | `tests/test_funcionarios.py` | CPF único entre ativos, matrícula única, recontratação, transferência, desligamento |
 | `tests/test_mfa.py` | Administrador/RH sem código não acessam nada além de `/auth/mfa/*`; código reutilizado é recusado |
 | `tests/test_logs.py` | Erro com CPF no corpo não escreve o CPF no log |
-| `tests/test_contrato.py` | Rotas e respostas batem com `packages/contracts/openapi.yaml` |
+| `tests/test_contrato.py` | Rotas e respostas batem com `system-ponto-digital-servioeste-back/contracts/openapi.yaml` |
 
 ## Etapa C: integração
 

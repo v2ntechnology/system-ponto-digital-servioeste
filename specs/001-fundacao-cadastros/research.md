@@ -6,16 +6,18 @@ Cada item segue o formato Decisão / Motivo / Alternativas. Fontes do projeto: `
 
 ## R1. Organização do repositório único
 
-- **Decisão:** `apps/web` (painel e portal, Vite), `services/api` (FastAPI), `packages/contracts` (OpenAPI +
-  tipos TypeScript gerados), `infra/` (Docker Compose e Caddy), `Makefile` na raiz. Workspace pnpm com
-  `apps/web` e `packages/contracts`. `apps/mobile` só nasce na feature 002/003.
-- **Motivo:** é a árvore do plano técnico; `infra/` e `Makefile` repetem o Hub, que a equipe já opera.
-- **Alternativas:** `frontend/` + `backend/` como no Hub (rejeitada: o plano técnico já fixou `apps/` e
-  `services/`, e haverá um segundo app em `apps/mobile`); Turborepo/Nx (rejeitada: Princípio X).
+- **Decisão** (revista em 2026-11-06 a pedido do usuário): tudo do frontend em `system-ponto-digital-servioeste-front` (painel e portal, Vite) e
+  tudo do backend em `system-ponto-digital-servioeste-back` (FastAPI), incluindo o contrato em `system-ponto-digital-servioeste-back/contracts` (OpenAPI + tipos TypeScript
+  gerados). `infra/` (Docker Compose e Caddy) e `Makefile` na raiz. Workspace pnpm com `system-ponto-digital-servioeste-front` e `system-ponto-digital-servioeste-back/contracts`.
+  A pasta do app mobile e do tablet será definida na feature 002/003.
+- **Motivo:** nomes que deixam claro o que é front e o que é back; `infra/` e `Makefile` repetem o Hub.
+- **Alternativas:** `apps/web` + `services/api` + `packages/contracts` (estrutura inicial, trocada a pedido do
+  usuário); contrato numa pasta própria na raiz ou dentro do front (rejeitadas: o back é dono da API);
+  repositórios separados para front e back (rejeitada pelo usuário); Turborepo/Nx (rejeitada: Princípio X).
 
-## R2. Contratos primeiro (`packages/contracts`)
+## R2. Contratos primeiro (`system-ponto-digital-servioeste-back/contracts`)
 
-- **Decisão:** contrato escrito à mão em **OpenAPI 3.1** (`packages/contracts/openapi.yaml`), fonte da verdade.
+- **Decisão:** contrato escrito à mão em **OpenAPI 3.1** (`system-ponto-digital-servioeste-back/contracts/openapi.yaml`), fonte da verdade.
   Tipos TypeScript gerados com **openapi-typescript** (`pnpm contracts:gen`). No backend, um teste de contrato
   compara rotas e métodos da API com o YAML e valida as respostas dos testes com **openapi-core**.
 - **Motivo:** o plano técnico exige contrato antes do frontend (passo 1) e o frontend simulado antes do backend
@@ -25,7 +27,7 @@ Cada item segue o formato Decisão / Motivo / Alternativas. Fontes do projeto: `
 
 ## R3. Dados simulados no frontend
 
-- **Decisão:** **MSW (Mock Service Worker)** em `apps/web/src/mocks/`, com handlers que seguem os tipos gerados.
+- **Decisão:** **MSW (Mock Service Worker)** em `system-ponto-digital-servioeste-front/src/mocks/`, com handlers que seguem os tipos gerados.
   Liga só com `VITE_MOCK=true` em `pnpm dev`, por `import()` dinâmico dentro de `if (import.meta.env.DEV)`.
   Dados fictícios gerados à mão (CPFs válidos de teste, nomes inventados), sem foto.
 - **Motivo:** o frontend chama a mesma `/api` que chamará em produção; trocar simulado por real é desligar a flag

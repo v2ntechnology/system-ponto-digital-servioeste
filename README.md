@@ -8,10 +8,13 @@ Sistema de ponto digital próprio da Servioeste (REP-P, Portaria MTP 671/2021).
 ## Estrutura
 
 ```text
-apps/web            Painel do RH e portal do funcionário (React + Vite + TypeScript, visual do Servioeste Hub)
-packages/contracts  Contrato da API (openapi.yaml) e tipos TypeScript gerados
-services/api        API (FastAPI + PostgreSQL), a partir da Parte B da feature 001
-infra/              Docker Compose e Caddy
+system-ponto-digital-servioeste-front/   Todo o frontend: painel do RH e portal do funcionário
+                                         (React + Vite + TypeScript, visual do Servioeste Hub)
+system-ponto-digital-servioeste-back/    Todo o backend: API (FastAPI + PostgreSQL) e o contrato
+  └── contracts/                         openapi.yaml (fonte da verdade) e tipos gerados para o front
+infra/                                   Docker Compose e Caddy (a partir da Parte B da feature 001)
+docs/briefing/                           Briefing, decisões, pendências, plano técnico e layout
+specs/                                   Especificações do Spec Kit
 ```
 
 ## Desenvolvimento
@@ -20,12 +23,12 @@ Pré-requisitos: Node 24 e pnpm 9 (e, a partir do backend, Docker).
 
 ```bash
 make install       # dependências do workspace
-make contracts     # regenera os tipos a partir de packages/contracts/openapi.yaml
-make front-mock    # front-end com dados simulados em http://localhost:5175
-make front         # front-end ligado à API real
-make test-web      # testes do front-end
-make lint-web      # eslint
-make build-web && make check-no-mocks   # build de produção sem nada simulado
+make contracts     # regenera os tipos a partir de system-ponto-digital-servioeste-back/contracts/openapi.yaml
+make front-mock    # front-end com dados simulados em http://localhost:5175 (ou: npm run dev:mock)
+make front         # front-end ligado à API real (ou: npm run dev)
+make test-front    # testes do front-end
+make lint-front    # eslint
+make build-front && make check-no-mocks   # build de produção sem nada simulado
 ```
 
 Portas de desenvolvimento: Postgres **5434**, API **8002**, Vite **5175**. Não colidem com o Radar

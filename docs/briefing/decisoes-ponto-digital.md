@@ -75,6 +75,7 @@ Status: **Decidido**, **Provisório** (vale até a validação indicada) ou **Ab
 | D-56 | Nenhuma integração no MVP além do arquivo para a folha. | Decidido |
 | D-58 | Cada feature começa pelo frontend com dados simulados; o backend entra depois da validação das telas. | Decidido |
 | D-57 | Motor facial em módulo trocável. Proposta: motor de testes + AWS Rekognition na validação. | Aberto |
+| D-59 | Repositório único com todo o frontend em `system-ponto-digital-servioeste-front` e todo o backend em `system-ponto-digital-servioeste-back`; o contrato da API fica em `system-ponto-digital-servioeste-back/contracts`. Pasta do app mobile/tablet a definir na feature 002/003. | Decidido |
 
 ## Motor facial (D-57)
 

@@ -1,3 +1,3 @@
 packages:
-  - apps/*
-  - packages/*
+  - system-ponto-digital-servioeste-front
+  - system-ponto-digital-servioeste-back/contracts

@@ -3,12 +3,11 @@
   "private": true,
   "packageManager": "pnpm@9.15.0",
   "scripts": {
-    "dev": "pnpm --filter web dev",
-    "dev:mock": "VITE_MOCK=true pnpm --filter web dev",
+    "dev": "pnpm --filter front dev",
+    "dev:mock": "VITE_MOCK=true pnpm --filter front dev",
     "contracts": "pnpm --filter @ponto/contracts gen",
-    "dev:web": "pnpm --filter web dev",
-    "build:web": "pnpm --filter web build",
-    "lint:web": "pnpm --filter web lint",
-    "test:web": "pnpm --filter web test"
+    "build:front": "pnpm --filter front build",
+    "lint:front": "pnpm --filter front lint",
+    "test:front": "pnpm --filter front test"
   }
 }

@@ -3,7 +3,7 @@
 # Falha se o build de produção do front-end contiver o MSW ou o service worker dele.
 set -euo pipefail
 
-DIST="${1:-apps/web/dist}"
+DIST="${1:-system-ponto-digital-servioeste-front/dist}"
 
 if [ ! -d "$DIST" ]; then
   echo "Build não encontrado em $DIST. Rode 'make build-web' antes." >&2

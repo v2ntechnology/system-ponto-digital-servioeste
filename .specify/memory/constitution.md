@@ -95,7 +95,7 @@ continua em paralelo. A substituição exige todos os critérios de `docs/briefi
 ### XII. Frontend primeiro, backend depois
 
 Em cada feature, as telas e os fluxos DEVEM ser construídos primeiro, com dados simulados que seguem os
-contratos de `packages`, e validados pela equipe. Só depois entram a API, o banco e as regras de backend, que
+contratos de `system-ponto-digital-servioeste-back/contracts`, e validados pela equipe. Só depois entram a API, o banco e as regras de backend, que
 substituem os dados simulados. Dados simulados NUNCA chegam à produção, nenhuma foto real é usada nessa fase, e o
 Princípio IX continua valendo quando o backend for implementado.
 
@@ -106,7 +106,9 @@ Princípio IX continua valendo quando o backend for implementado.
 - **Stack (D-50):** API em Python com FastAPI; PostgreSQL; app e tablet em React Native com Expo (tablet em modo
   quiosque); painel do RH e portal em React + Vite + TypeScript + Tailwind + shadcn/ui, a mesma stack do
   Servioeste Hub; PDFs com WeasyPrint. Infraestrutura com Docker e Caddy em VPS.
-- **Repositório único:** `apps/mobile`, `apps/web`, `services/api`, `packages`, `docs/briefing`, `specs`.
+- **Repositório único:** `system-ponto-digital-servioeste-front` (todo o frontend), `system-ponto-digital-servioeste-back` (todo o backend, incluindo o contrato em
+  `system-ponto-digital-servioeste-back/contracts`), `infra`, `docs/briefing`, `specs`. A pasta do app mobile e do tablet é definida na
+  feature 002/003.
 - **Layout:** painel e portal seguem a linguagem visual do Servioeste Hub (referência principal) e do Radar,
   conforme `docs/briefing/layout.md`.
 - **REP-P:** relógio sincronizado com a Hora Legal Brasileira (variação máxima de 30 s); NSR sequencial por
@@ -144,4 +146,4 @@ Princípio IX continua valendo quando o backend for implementado.
 - Documentação, specs e textos da interface ficam em português do Brasil.
 - Orientação de dia a dia: `docs/briefing/` (decisões, pendências, plano técnico e layout).
 
-**Version**: 1.0.0 | **Ratified**: 2026-11-06 | **Last Amended**: 2026-11-06
+**Version**: 1.0.1 | **Ratified**: 2026-11-06 | **Last Amended**: 2026-11-06

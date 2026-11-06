@@ -4,7 +4,7 @@ info:
   version: 0.1.0
   description: |
     Contrato da feature 001 (fundação e cadastros). Fonte da verdade: este arquivo é copiado para
-    packages/contracts/openapi.yaml, de onde saem os tipos TypeScript e os testes de contrato do backend.
+    system-ponto-digital-servioeste-back/contracts/openapi.yaml, de onde saem os tipos TypeScript e os testes de contrato do backend.
     Sessão por cookie httpOnly. Todas as rotas exigem sessão com MFA concluído, exceto as marcadas com
     `security: []` ou com a tag `mfa`. Erros seguem o schema `Erro`. Nenhuma resposta de erro contém CPF.
 servers:

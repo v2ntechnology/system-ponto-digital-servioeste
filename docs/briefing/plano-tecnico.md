@@ -23,7 +23,7 @@ O visual do painel e do portal segue o Servioeste Hub. Ver `layout.md`.
 
 Toda feature segue esta sequência, e o `tasks.md` deve refleti-la:
 
-1. **Contratos:** definir os tipos e as respostas esperadas da API em `packages`.
+1. **Contratos:** definir os tipos e as respostas esperadas da API em `system-ponto-digital-servioeste-back/contracts`.
 2. **Frontend:** construir telas, navegação, estados de carregamento, erro e vazio, usando dados simulados que seguem esses contratos.
 3. **Validação:** a equipe revisa os fluxos antes de iniciar o backend.
 4. **Backend:** implementar API, banco e regras de negócio, com testes antes do código nas áreas do Princípio IX.
@@ -36,12 +36,13 @@ Features com pouca interface, como a geração de arquivos legais, seguem a mesm
 Repositório único:
 
 ```text
-apps/mobile      App e tablet (dois modos do mesmo projeto)
-apps/web         Painel do RH e portal do funcionário
-services/api     API e regras de negócio
-packages         Tipos e contratos compartilhados
-docs/briefing    Este pacote
-specs            Gerado pelo Spec Kit
+system-ponto-digital-servioeste-front            Painel do RH e portal do funcionário (React + Vite)
+system-ponto-digital-servioeste-back             API, banco e regras de negócio
+system-ponto-digital-servioeste-back/contracts   Contrato da API (OpenAPI) e tipos gerados para o front
+infra                                   Docker Compose e Caddy
+docs/briefing                           Este pacote
+specs                                   Gerado pelo Spec Kit
+(a definir na feature 002/003)          App e tablet (Expo, dois modos do mesmo projeto)
 ```
 
 Separações obrigatórias dentro da API:

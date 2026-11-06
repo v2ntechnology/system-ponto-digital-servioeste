@@ -10,9 +10,9 @@
 Criar a base do repositório único e a primeira fatia funcional: estrutura da empresa (empresa → estabelecimento →
 unidade → setor), cadastro de funcionários com lotação e local de prestação com vigência, feriados por
 abrangência, usuários do painel com perfis, escopo e segundo fator, trilha de auditoria e o ARP com NSR por
-estabelecimento e hash encadeado. A ordem segue o plano técnico: contrato OpenAPI em `packages/contracts` →
-telas em `apps/web` com dados simulados (MSW) no visual do Servioeste Hub → validação da equipe → API em
-`services/api` com testes primeiro nas áreas do Princípio IX → integração e remoção do simulado do fluxo de
+estabelecimento e hash encadeado. A ordem segue o plano técnico: contrato OpenAPI em `system-ponto-digital-servioeste-back/contracts` →
+telas em `system-ponto-digital-servioeste-front` com dados simulados (MSW) no visual do Servioeste Hub → validação da equipe → API em
+`system-ponto-digital-servioeste-back` com testes primeiro nas áreas do Princípio IX → integração e remoção do simulado do fluxo de
 produção.
 
 ## Contexto Técnico
@@ -32,8 +32,7 @@ Testing Library (web); ruff e eslint
 
 **Plataforma alvo**: navegador (desktop e celular) para o painel; API em Linux via Docker + Caddy
 
-**Tipo de projeto**: aplicação web (SPA + API) dentro de repositório único com `apps/`, `services/` e
-`packages/`
+**Tipo de projeto**: aplicação web (SPA + API) em repositório único, com `system-ponto-digital-servioeste-front` e `system-ponto-digital-servioeste-back`
 
 **Metas de desempenho**: cadastro de funcionário em menos de 2 min (SC-004); busca de funcionário em menos de
 10 s (SC-005), com listas paginadas e resposta da API abaixo de 500 ms para a base do piloto
@@ -80,7 +79,7 @@ specs/001-fundacao-cadastros/
 ├── data-model.md        # Fase 1
 ├── quickstart.md        # Fase 1
 ├── contracts/
-│   └── openapi.yaml     # Fase 1 (copiado para packages/contracts)
+│   └── openapi.yaml     # Fase 1 (copiado para system-ponto-digital-servioeste-back/contracts)
 ├── checklists/
 │   └── requirements.md
 └── tasks.md             # Fase 2 (/speckit-tasks)
@@ -89,72 +88,72 @@ specs/001-fundacao-cadastros/
 ### Código-fonte (raiz do repositório)
 
 ```text
-Makefile                         # up, down, test, lint, admin, install, contracts, front, front-mock, check-no-mocks
-package.json                     # workspace pnpm (scripts de conveniência)
-pnpm-workspace.yaml              # apps/web, packages/*
+Makefile                         # install, contracts, front, front-mock, build-front, check-no-mocks; up, test, admin (Parte B)
+package.json                     # workspace pnpm (atalhos: dev, dev:mock, contracts, build/lint/test:front)
+pnpm-workspace.yaml              # system-ponto-digital-servioeste-front e system-ponto-digital-servioeste-back/contracts
 .env.example                     # sem segredos reais
 infra/
 ├── docker-compose.yml           # dev: postgres (5434) + api (8002)
 ├── docker-compose.prod.yml      # caddy + api + postgres (homologação/produção)
 └── Caddyfile
-packages/
-└── contracts/
-    ├── openapi.yaml             # fonte da verdade
-    ├── package.json
-    └── src/schema.d.ts          # gerado (openapi-typescript), versionado
-apps/
-└── web/
-    ├── index.html
-    ├── vite.config.ts           # porta 5175, proxy /api -> 8002, alias @
-    ├── components.json          # shadcn new-york, neutral
-    ├── public/                  # favicon.svg, logo-servioeste.svg, login-servioeste.webp (do Hub)
-    ├── src/
-    │   ├── main.tsx             # liga MSW só se DEV && VITE_MOCK
-    │   ├── index.css            # tokens do Hub
-    │   ├── lib/                 # api.ts, theme.tsx, utils.ts, format.ts (cpf, datas), permissoes.ts
-    │   ├── components/
-    │   │   ├── ui/              # button, input, label, avatar, table, dialog, select, badge, tabs, toast
-    │   │   └── layout/          # AppShell, TopBar, UserMenu, Brand ("Servioeste Ponto"), RequirePermissao
-    │   ├── features/
-    │   │   ├── auth/            # login, MFA (cadastro com QR e verificação), useAuth
-    │   │   ├── estrutura/       # empresas, estabelecimentos, unidades, setores
-    │   │   ├── funcionarios/    # lista, ficha, formulário, transferência, local de prestação, desligamento
-    │   │   ├── feriados/
-    │   │   ├── usuarios/        # perfis, escopo, redefinir MFA
-    │   │   └── auditoria/       # auditoria + eventos do ARP
-    │   ├── pages/               # LoginPage, MfaPage, FuncionariosPage, FuncionarioPage, EstruturaPage,
-    │   │                        # FeriadosPage, UsuariosPage, AuditoriaPage, ConfiguracoesPage, ErrorPage
-    │   └── mocks/               # browser.ts, handlers/*.ts, dados.ts (só dev)
-    └── tests/                   # Vitest + Testing Library
-services/
-└── api/
-    ├── Dockerfile
-    ├── pyproject.toml
-    ├── alembic.ini
-    ├── alembic/versions/        # 0001_fundacao.py (tabelas, extensões, gatilhos, papéis, sementes)
-    ├── app/
-    │   ├── main.py
-    │   ├── cli.py               # create-admin, reset-mfa
-    │   ├── core/                # config, db, security (do Hub), mfa, logging (máscara de CPF)
-    │   ├── models/              # estrutura, funcionario, feriado, usuario, auditoria
-    │   ├── rep/                 # arp.py (gravação com NSR + hash), nsr.py  -- fronteira do REP
-    │   ├── services/            # audit, escopo (filtro único), permissoes, rate_limit, cpf
-    │   ├── schemas.py
-    │   └── api/
-    │       ├── deps.py          # sessão, exige(permissao), MFA concluído
-    │       └── routes/          # auth, mfa, empresas, estabelecimentos, unidades, setores,
-    │                            # tipos_vinculo, funcionarios, feriados, usuarios, auditoria, arp, health
-    └── tests/
-        ├── conftest.py          # Postgres de teste, papel ponto_app
-        ├── arp/                 # test_imutabilidade, test_nsr, test_hash
-        └── test_*.py            # escopo, funcionarios, estrutura, feriados, usuarios, mfa, logs, contrato
-.github/workflows/ci.yml         # lint, testes (Postgres service), build web, check-no-mocks
+system-ponto-digital-servioeste-front/   # painel do RH e portal (React + Vite)
+├── index.html
+├── vite.config.ts               # porta 5175, proxy /api -> 8002, alias @, MSW só no servidor de dev
+├── components.json              # shadcn new-york, neutral
+├── public/                      # favicon.svg, logo-servioeste.svg, login-servioeste.webp (do Hub)
+├── src/
+│   ├── main.tsx                 # liga MSW só se DEV && VITE_MOCK
+│   ├── App.tsx, rotas.tsx, Providers.tsx
+│   ├── index.css                # tokens do Hub
+│   ├── lib/                     # api.ts, theme.tsx, utils.ts, format.ts, cpf.ts, permissoes.ts
+│   ├── components/
+│   │   ├── ui/                  # button, input, label, avatar, table, dialog, select, badge, tabs, toast, estados
+│   │   └── layout/              # AppShell, TopBar, UserMenu, Brand ("Servioeste Ponto"), Cabecalho, RequirePermissao
+│   ├── features/
+│   │   ├── auth/                # login, MFA (cadastro com QR e verificação), useAuth
+│   │   ├── estrutura/           # empresas, estabelecimentos, unidades, setores
+│   │   ├── funcionarios/        # lista, ficha, formulário, transferência, local de prestação, desligamento
+│   │   ├── feriados/
+│   │   ├── usuarios/            # perfis, escopo, redefinir MFA
+│   │   └── auditoria/           # auditoria + eventos do ARP
+│   ├── pages/                   # LoginPage, MfaPage, FuncionariosPage, FuncionarioPage, EstruturaPage,
+│   │                            # FeriadosPage, UsuariosPage, AuditoriaPage, ConfiguracoesPage, ErrorPage
+│   └── mocks/                   # browser.ts, util.ts, handlers/*.ts, dados.ts (só dev e testes)
+└── tests/                       # Vitest + Testing Library + MSW no Node
+system-ponto-digital-servioeste-back/    # API, banco e contrato
+├── contracts/                   # dono do contrato da API
+│   ├── openapi.yaml             # fonte da verdade
+│   ├── package.json             # @ponto/contracts (gera os tipos para o front)
+│   └── src/schema.d.ts          # gerado (openapi-typescript), versionado
+├── Dockerfile
+├── pyproject.toml
+├── alembic.ini
+├── alembic/versions/            # 0001_fundacao.py (tabelas, extensões, gatilhos, papéis, sementes)
+├── app/
+│   ├── main.py
+│   ├── cli.py                   # create-admin, reset-mfa
+│   ├── core/                    # config, db, security (do Hub), mfa, logging (máscara de CPF)
+│   ├── models/                  # estrutura, funcionario, feriado, usuario, auditoria
+│   ├── rep/                     # arp.py (gravação com NSR + hash), nsr.py  -- fronteira do REP
+│   ├── services/                # audit, escopo (filtro único), permissoes, rate_limit, cpf
+│   ├── schemas.py
+│   └── api/
+│       ├── deps.py              # sessão, exige(permissao), MFA concluído
+│       └── routes/              # auth, mfa, empresas, estabelecimentos, unidades, setores,
+│                                # tipos_vinculo, funcionarios, feriados, usuarios, auditoria, arp, health
+└── tests/
+    ├── conftest.py              # Postgres de teste, papel ponto_app
+    ├── arp/                     # test_imutabilidade, test_nsr, test_hash
+    └── test_*.py                # escopo, funcionarios, estrutura, feriados, usuarios, mfa, logs, contrato
+scripts/check-no-mocks.sh        # garante que o build de produção não tem nada simulado
+.github/workflows/ci.yml         # lint, testes, build do front, check-no-mocks (+ API na Parte B)
 ```
 
-**Decisão de estrutura**: repositório único conforme o plano técnico (`apps/web`, `services/api`,
-`packages/contracts`), com `infra/` e `Makefile` no padrão do Servioeste Hub. `apps/mobile` fica para as
-features 002/003. O módulo `services/api/app/rep/` concentra ARP e NSR desde já, para manter a separação REP ×
-PTRP exigida pelo plano técnico.
+**Decisão de estrutura** (pedido do usuário, 2026-11-06): repositório único com tudo do frontend em
+`system-ponto-digital-servioeste-front` e tudo do backend em `system-ponto-digital-servioeste-back`. O contrato da API mora no back (`system-ponto-digital-servioeste-back/contracts`), que é quem o implementa; o
+front gera os tipos a partir dele pelo workspace pnpm. `infra/` e `Makefile` seguem o padrão do Servioeste Hub. A
+pasta do app mobile e do tablet (Expo) será definida na feature 002/003. O módulo `system-ponto-digital-servioeste-back/app/rep/` concentra ARP e
+NSR desde já, para manter a separação REP × PTRP exigida pelo plano técnico.
 
 ## Dependências novas (Princípio X)
 
