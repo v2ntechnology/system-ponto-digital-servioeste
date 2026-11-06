@@ -11,6 +11,7 @@ Sistema de ponto próprio (REP-P, Portaria 671/2021), feito do zero para substit
 | `plano-tecnico.md` | Stack, arquitetura e restrições técnicas | `/speckit.plan` (em cada feature) |
 | `decisoes.md` | Registro de todas as decisões tomadas | Consulta |
 | `pendencias.md` | Perguntas abertas, com os mesmos códigos do `.docx` para o RH | `/speckit.clarify` e consulta |
+| `layout.md` | Referência visual (Servioeste Hub e Radar) | `/speckit.plan` (telas) |
 
 Coloque esta pasta em `docs/briefing/` do repositório. Não use a pasta `specs/` da raiz, porque o Spec Kit gera os arquivos dele lá.
 
@@ -35,7 +36,7 @@ Coloque esta pasta em `docs/briefing/` do repositório. Não use a pasta `specs/
    ```text
    /speckit.specify  Use docs/briefing/features/001-fundacao-e-cadastros.md como fonte. Escreva em português.
    /speckit.clarify
-   /speckit.plan     Siga docs/briefing/plano-tecnico.md e consulte decisoes.md e pendencias.md.
+   /speckit.plan     Siga docs/briefing/plano-tecnico.md e docs/briefing/layout.md, e consulte decisoes.md e pendencias.md.
    /speckit.tasks    Comece pelo frontend com dados simulados e só depois inclua o backend, conforme a "Ordem de implementação" do plano técnico.
    /speckit.analyze
    /speckit.implement

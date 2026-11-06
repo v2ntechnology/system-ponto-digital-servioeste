@@ -9,13 +9,15 @@ Entrada para `/speckit.plan`. As regras de negócio ficam nas features.
 | API | Python com FastAPI |
 | Banco | PostgreSQL |
 | App dos motoristas e tablet | Um projeto React Native com Expo; tablet em modo quiosque |
-| Painel do RH e portal do funcionário | Next.js |
+| Painel do RH e portal do funcionário | React + Vite + TypeScript, Tailwind 4, componentes no estilo shadcn/ui, TanStack Query e React Router (mesma stack do Servioeste Hub) |
 | PDFs | WeasyPrint |
 | Assinatura | Módulo próprio, com biblioteca Python compatível com CAdES e PAdES |
 | Infraestrutura | Docker e Caddy em VPS |
 | CI | Testes e verificações a cada alteração |
 
 Facial no aparelho e armazenamento seguro podem exigir development build do Expo, em vez do Expo Go.
+
+O visual do painel e do portal segue o Servioeste Hub. Ver `layout.md`.
 
 ## Ordem de implementação
 

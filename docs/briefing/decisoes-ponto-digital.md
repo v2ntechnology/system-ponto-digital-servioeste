@@ -66,7 +66,7 @@ Status: **Decidido**, **Provisório** (vale até a validação indicada) ou **Ab
 
 | ID | Decisão | Status |
 |---|---|---|
-| D-50 | FastAPI, PostgreSQL, React Native/Expo (app e tablet), Next.js (painel e portal), WeasyPrint. | Decidido |
+| D-50 | FastAPI, PostgreSQL, React Native/Expo (app e tablet), React + Vite + TypeScript + Tailwind + shadcn/ui (painel e portal, mesma stack do Servioeste Hub; substitui o Next.js em 2026-11-06), WeasyPrint. | Decidido |
 | D-51 | Docker e Caddy, com homologação e produção separadas e backup externo criptografado. | Decidido |
 | D-52 | VPS será usada, mas ainda não existe. Desenvolvimento roda localmente. | Decidido |
 | D-53 | Produção não compartilha servidor com outras automações. | Decidido |

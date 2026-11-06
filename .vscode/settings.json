@@ -1,8 +1,35 @@
 {
+  // Árvore de pastas: mostra cada pasta no seu nível (sem juntar "pasta/subpasta" numa linha só).
   "explorer.compactFolders": false,
+  "explorer.sortOrder": "foldersNestsFiles",
+
+  // Agrupa arquivos que andam juntos embaixo do principal (clique na setinha para ver).
+  "explorer.fileNesting.enabled": true,
+  "explorer.fileNesting.expand": false,
+  "explorer.fileNesting.patterns": {
+    "package.json": "pnpm-lock.yaml, pnpm-workspace.yaml, .npmrc",
+    "tsconfig.json": "tsconfig.*.json",
+    "vite.config.ts": "eslint.config.js, components.json",
+    "pyproject.toml": "alembic.ini",
+    "Dockerfile": ".dockerignore",
+    ".env.example": ".env"
+  },
+
+  // Esconde o que é gerado ou cache (continua no disco).
   "files.exclude": {
-    "**/node_modules": true,
     "**/__pycache__": true,
-    "**/.pytest_cache": true
-  }
+    "**/.pytest_cache": true,
+    "**/.ruff_cache": true,
+    "**/*.egg-info": true
+  },
+  "search.exclude": {
+    "**/node_modules": true,
+    "**/dist": true,
+    "**/pnpm-lock.yaml": true
+  },
+
+  "editor.rulers": [120],
+  "files.insertFinalNewline": true,
+  "files.trimTrailingWhitespace": true,
+  "[python]": { "editor.defaultFormatter": "charliermarsh.ruff" }
 }
