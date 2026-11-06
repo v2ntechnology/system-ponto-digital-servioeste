@@ -1,4 +1,4 @@
-import { CalendarDays, ScrollText, UserCog, Users } from "lucide-react"
+import { CalendarDays, ScrollText, UserCog } from "lucide-react"
 import { Navigate, type RouteObject } from "react-router-dom"
 
 import { RequirePermissao } from "@/components/layout/RequirePermissao"
@@ -7,6 +7,9 @@ import { ConfiguracoesPage } from "@/pages/ConfiguracoesPage"
 import { EmConstrucao } from "@/pages/EmConstrucao"
 import { ErrorPage } from "@/pages/ErrorPage"
 import { EstruturaPage } from "@/pages/EstruturaPage"
+import { FuncionarioNovoPage } from "@/pages/FuncionarioNovoPage"
+import { FuncionarioPage } from "@/pages/FuncionarioPage"
+import { FuncionariosPage } from "@/pages/FuncionariosPage"
 import { LoginPage } from "@/pages/LoginPage"
 import { MfaPage } from "@/pages/MfaPage"
 
@@ -21,15 +24,15 @@ export const rotas: RouteObject[] = [
       { path: "/", element: <Navigate to="/funcionarios" replace /> },
       {
         path: "/funcionarios",
-        element: <RequirePermissao permissao="funcionario.ler"><EmConstrucao titulo="Funcionários" icone={Users} fase="Fase 4" /></RequirePermissao>,
+        element: <RequirePermissao permissao="funcionario.ler"><FuncionariosPage /></RequirePermissao>,
       },
       {
         path: "/funcionarios/novo",
-        element: <RequirePermissao permissao="funcionario.editar"><EmConstrucao titulo="Novo funcionário" icone={Users} fase="Fase 4" /></RequirePermissao>,
+        element: <RequirePermissao permissao="funcionario.editar"><FuncionarioNovoPage /></RequirePermissao>,
       },
       {
         path: "/funcionarios/:id",
-        element: <RequirePermissao permissao="funcionario.ler"><EmConstrucao titulo="Funcionário" icone={Users} fase="Fase 4" /></RequirePermissao>,
+        element: <RequirePermissao permissao="funcionario.ler"><FuncionarioPage /></RequirePermissao>,
       },
       {
         path: "/estrutura",
