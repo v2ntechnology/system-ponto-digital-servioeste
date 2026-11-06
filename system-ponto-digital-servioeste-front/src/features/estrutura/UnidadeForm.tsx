@@ -10,14 +10,14 @@ import { Dialog } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
 import { Select } from "@/components/ui/select"
 import { useToast } from "@/components/ui/toast"
-import { formatarIdentificador } from "@/lib/cnpj"
+import { formatarIdentificador, NOME_IDENTIFICADOR } from "@/lib/cnpj"
 import { somenteDigitos } from "@/lib/cpf"
 import { erroDoCampo, erroGeral } from "@/lib/erros"
 import { todayIso } from "@/lib/format"
 
 import { useAlterarUnidade, useCriarUnidade } from "./api"
 
-const rotuloEst = (e: Estabelecimento) => `${e.razao_social} · ${formatarIdentificador(e.tipo_identificador, e.identificador)}`
+const detalheEst = (e: Estabelecimento) => `${NOME_IDENTIFICADOR[e.tipo_identificador]} ${formatarIdentificador(e.tipo_identificador, e.identificador)}`
 
 /**
  * Unidade (local físico), ligada a um estabelecimento. Na edição, trocar o estabelecimento abre uma nova vigência
@@ -99,7 +99,7 @@ export function UnidadeForm({ empresaId, estabelecimentos, unidade, estabelecime
             ajuda={unidade && trocar ? "As marcações anteriores continuam no estabelecimento antigo." : undefined}>
             {(p) => (
               <Select {...p} value={estId} disabled={!podeEscolherEst} onChange={(e) => setEstId(e.target.value)}>
-                {ativos.map((e) => <option key={e.id} value={e.id}>{rotuloEst(e)}</option>)}
+                {ativos.map((e) => <option key={e.id} value={e.id} data-detalhe={detalheEst(e)}>{e.razao_social}</option>)}
               </Select>
             )}
           </Campo>

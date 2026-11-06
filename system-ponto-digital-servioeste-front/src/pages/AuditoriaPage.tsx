@@ -14,7 +14,7 @@ import { conferirCadeia, useAuditoria, useEventosArp, type FiltrosAuditoria } fr
 import { FILTROS_ACAO, NOME_ACAO, NOME_EVENTO_ARP } from "@/features/auditoria/rotulos"
 import { useEstabelecimentos } from "@/features/estrutura/api"
 import { useUsuarios } from "@/features/usuarios/api"
-import { formatarIdentificador } from "@/lib/cnpj"
+import { formatarIdentificador, NOME_IDENTIFICADOR } from "@/lib/cnpj"
 import { fmtDateTime } from "@/lib/format"
 import { cn } from "@/lib/utils"
 
@@ -103,7 +103,7 @@ function EventosArp() {
       <div className="max-w-md space-y-1.5">
         <Label htmlFor="arp-est">Estabelecimento</Label>
         <Select id="arp-est" value={estId} onChange={(e) => setEscolhido(e.target.value)}>
-          {ests.map((e) => <option key={e.id} value={e.id}>{e.razao_social} · {formatarIdentificador(e.tipo_identificador, e.identificador)}</option>)}
+          {ests.map((e) => <option key={e.id} value={e.id} data-detalhe={`${NOME_IDENTIFICADOR[e.tipo_identificador]} ${formatarIdentificador(e.tipo_identificador, e.identificador)}`}>{e.razao_social}</option>)}
         </Select>
       </div>
       {eventos.length > 0 && (

@@ -1,4 +1,4 @@
-import { render } from "@testing-library/react"
+import { render, screen } from "@testing-library/react"
 import userEvent from "@testing-library/user-event"
 import { createMemoryRouter, RouterProvider } from "react-router-dom"
 
@@ -23,3 +23,10 @@ export function entrarComo(email: "admin@exemplo.test" | "rh@exemplo.test" | "ge
 }
 
 export { SENHA_TESTE }
+
+/** Escolhe uma opção numa lista de escolha (componente Select): abre a lista e clica na opção. */
+export async function escolher(user: ReturnType<typeof userEvent.setup>, lista: HTMLElement, opcao: string) {
+  await user.click(lista)
+  const alvo = await screen.findByRole("option", { name: (nome) => nome === opcao || nome.startsWith(`${opcao} `) })
+  await user.click(alvo)
+}

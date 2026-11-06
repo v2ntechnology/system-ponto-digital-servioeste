@@ -22,10 +22,11 @@ export function Dialog({ open, onClose, title, description, children, footer, cl
   useEffect(() => {
     if (!open) return
     const anterior = document.activeElement as HTMLElement | null
-    const primeiro = panel.current?.querySelector<HTMLElement>("input, select, textarea, button:not([data-fechar])")
+    const primeiro = panel.current?.querySelector<HTMLElement>("input, select, textarea, [role=combobox], button:not([data-fechar])")
     primeiro?.focus()
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose()
+      // Esc já usado por um componente interno (ex.: fechar uma lista de escolha) não fecha o diálogo.
+      if (e.key === "Escape" && !e.defaultPrevented) onClose()
     }
     document.addEventListener("keydown", onKey)
     const overflow = document.body.style.overflow

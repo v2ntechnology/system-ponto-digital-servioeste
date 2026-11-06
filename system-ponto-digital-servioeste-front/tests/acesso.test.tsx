@@ -3,7 +3,7 @@ import { describe, expect, it } from "vitest"
 
 import { cpfFicticio, db } from "@/mocks/dados"
 
-import { entrarComo, renderizarApp } from "./renderizar"
+import { entrarComo, escolher, renderizarApp } from "./renderizar"
 
 const idPorNome = (nome: string) => db.funcionarios.find((f) => f.nome === nome)!.id
 
@@ -64,7 +64,7 @@ describe("acesso respeita o perfil", () => {
     const d = await screen.findByRole("dialog", { name: "Novo usuário" })
     await user.type(within(d).getByLabelText("Nome"), "RH Novo")
     await user.type(within(d).getByLabelText("E-mail"), "rh2@exemplo.test")
-    await user.selectOptions(within(d).getByLabelText("Perfil"), "rh")
+    await escolher(user, within(d).getByLabelText("Perfil"), "RH")
     await user.type(within(d).getByLabelText("Senha inicial"), "senha-forte-123")
     await user.click(within(d).getByRole("checkbox", { name: "Todas as unidades" }))
     await user.click(within(d).getByRole("button", { name: "Salvar" }))

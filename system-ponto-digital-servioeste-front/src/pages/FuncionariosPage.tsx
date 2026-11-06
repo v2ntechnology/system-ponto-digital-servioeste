@@ -88,8 +88,8 @@ export function FuncionariosPage() {
             <Select id="f-setor" value={setorId} onChange={(e) => definir("setor", e.target.value)}>
               <option value="">Todos</option>
               {setores.filter((s) => !unidadeId || s.unidade_id === unidadeId).map((s) => (
-                <option key={s.id} value={s.id}>
-                  {s.nome}{!unidadeId ? ` · ${unidades.find((u) => u.id === s.unidade_id)?.nome ?? ""}` : ""}
+                <option key={s.id} value={s.id} data-detalhe={!unidadeId ? unidades.find((u) => u.id === s.unidade_id)?.nome : undefined}>
+                  {s.nome}
                 </option>
               ))}
             </Select>

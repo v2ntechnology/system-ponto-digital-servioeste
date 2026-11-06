@@ -4,7 +4,7 @@ import { describe, expect, it } from "vitest"
 import { addDays, fmtDate, todayIso } from "@/lib/format"
 import { cpfFicticio, db } from "@/mocks/dados"
 
-import { entrarComo, renderizarApp } from "./renderizar"
+import { entrarComo, escolher, renderizarApp } from "./renderizar"
 
 const idPorNome = (nome: string) => db.funcionarios.find((f) => f.nome === nome)!.id
 
@@ -74,7 +74,7 @@ describe("cadastro de funcionários", () => {
     const { user } = renderizarApp(`/funcionarios/${id}`)
     await user.click(await screen.findByRole("button", { name: /Transferir/ }))
     const dialogo = await screen.findByRole("dialog", { name: "Transferir funcionário" })
-    await user.selectOptions(await within(dialogo).findByLabelText("Novo setor"), "Administrativo")
+    await escolher(user, await within(dialogo).findByLabelText("Novo setor"), "Administrativo")
     await user.click(within(dialogo).getByRole("button", { name: "Transferir" }))
     await waitFor(() => expect(screen.queryByRole("dialog")).not.toBeInTheDocument())
 
