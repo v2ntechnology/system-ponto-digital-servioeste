@@ -1,6 +1,9 @@
 # Atalhos do Ponto Digital Servioeste. Rode `make help` para ver todos.
-# Pastas: system-ponto-digital-servioeste-front (painel e portal) e system-ponto-digital-servioeste-back (API e contrato).
+# Pastas independentes: system-ponto-digital-servioeste-front (painel e portal, Node)
+# e system-ponto-digital-servioeste-back (API em Python e o contrato openapi.yaml). A raiz não tem nada de Node.
 # Portas de dev: Postgres 5434, API 8002, Vite 5175 (não batem com Radar e Hub).
+
+FRONT := system-ponto-digital-servioeste-front
 
 .DEFAULT_GOAL := help
 .PHONY: help install contracts front front-mock build-front check-no-mocks test-front lint-front
@@ -8,26 +11,26 @@
 help: ## lista os comandos
 	@grep -E '^[a-z-]+:.*## ' $(MAKEFILE_LIST) | awk -F':.*## ' '{printf "  make %-15s %s\n", $$1, $$2}'
 
-install: ## instala as dependências (front + contrato do back)
-	pnpm install
+install: ## instala as dependências do front-end
+	cd $(FRONT) && pnpm install
 
-contracts: ## gera os tipos TypeScript a partir de system-ponto-digital-servioeste-back/contracts/openapi.yaml
-	pnpm contracts
+contracts: ## gera os tipos do front a partir de system-ponto-digital-servioeste-back/contracts/openapi.yaml
+	cd $(FRONT) && pnpm contracts
 
 front: ## front-end ligado à API real em http://localhost:5175
-	pnpm dev
+	cd $(FRONT) && pnpm dev
 
 front-mock: ## front-end com dados simulados (MSW) em http://localhost:5175
-	pnpm dev:mock
+	cd $(FRONT) && pnpm dev:mock
 
-build-front: ## build de produção do front-end (system-ponto-digital-servioeste-front/dist)
-	pnpm build:front
+build-front: ## build de produção do front-end ($(FRONT)/dist)
+	cd $(FRONT) && pnpm build
 
 check-no-mocks: ## falha se o build de produção tiver código de dados simulados
 	./scripts/check-no-mocks.sh
 
 test-front: ## testes do front-end (Vitest)
-	pnpm test:front
+	cd $(FRONT) && pnpm test
 
 lint-front: ## eslint no front-end
-	pnpm lint:front
+	cd $(FRONT) && pnpm lint

@@ -8,7 +8,7 @@ Cada item segue o formato Decisão / Motivo / Alternativas. Fontes do projeto: `
 
 - **Decisão** (revista em 2026-11-06 a pedido do usuário): tudo do frontend em `system-ponto-digital-servioeste-front` (painel e portal, Vite) e
   tudo do backend em `system-ponto-digital-servioeste-back` (FastAPI), incluindo o contrato em `system-ponto-digital-servioeste-back/contracts` (OpenAPI + tipos TypeScript
-  gerados). `infra/` (Docker Compose e Caddy) e `Makefile` na raiz. Workspace pnpm com `system-ponto-digital-servioeste-front` e `system-ponto-digital-servioeste-back/contracts`.
+  gerados). `infra/` (Docker Compose e Caddy) e `Makefile` na raiz. Front e back são projetos independentes, sem workspace nem `node_modules` na raiz.
   A pasta do app mobile e do tablet será definida na feature 002/003.
 - **Motivo:** nomes que deixam claro o que é front e o que é back; `infra/` e `Makefile` repetem o Hub.
 - **Alternativas:** `apps/web` + `services/api` + `packages/contracts` (estrutura inicial, trocada a pedido do
@@ -18,7 +18,7 @@ Cada item segue o formato Decisão / Motivo / Alternativas. Fontes do projeto: `
 ## R2. Contratos primeiro (`system-ponto-digital-servioeste-back/contracts`)
 
 - **Decisão:** contrato escrito à mão em **OpenAPI 3.1** (`system-ponto-digital-servioeste-back/contracts/openapi.yaml`), fonte da verdade.
-  Tipos TypeScript gerados com **openapi-typescript** (`pnpm contracts:gen`). No backend, um teste de contrato
+  Tipos TypeScript gerados com **openapi-typescript** (`npm run contracts` dentro de `system-ponto-digital-servioeste-front`, gravando em `src/contracts/schema.d.ts`). No backend, um teste de contrato
   compara rotas e métodos da API com o YAML e valida as respostas dos testes com **openapi-core**.
 - **Motivo:** o plano técnico exige contrato antes do frontend (passo 1) e o frontend simulado antes do backend
   (Princípio XII). Gerar o contrato a partir do FastAPI inverteria essa ordem.

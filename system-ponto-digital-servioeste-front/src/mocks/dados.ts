@@ -3,7 +3,7 @@
 import type {
   Endereco, EventoArp, Feriado, LocalPrestacao, Perfil, RegistroAuditoria, Setor, TipoRegistro, TipoVinculo,
   Escopo, Estabelecimento, Empresa, Unidade,
-} from "@ponto/contracts"
+} from "@/contracts"
 
 import { digitosVerificadores } from "@/lib/cpf"
 

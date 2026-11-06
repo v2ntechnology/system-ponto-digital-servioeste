@@ -38,7 +38,7 @@ Repositório único:
 ```text
 system-ponto-digital-servioeste-front            Painel do RH e portal do funcionário (React + Vite)
 system-ponto-digital-servioeste-back             API, banco e regras de negócio
-system-ponto-digital-servioeste-back/contracts   Contrato da API (OpenAPI) e tipos gerados para o front
+system-ponto-digital-servioeste-back/contracts   Contrato da API (OpenAPI); o front gera os tipos a partir dele
 infra                                   Docker Compose e Caddy
 docs/briefing                           Este pacote
 specs                                   Gerado pelo Spec Kit

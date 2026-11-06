@@ -1,4 +1,4 @@
-import type { Eu, LoginEntrada, LoginResultado } from "@ponto/contracts"
+import type { Eu, LoginEntrada, LoginResultado } from "@/contracts"
 import { http, HttpResponse } from "msw"
 
 import { CODIGO_MFA_TESTE, db, PERMISSOES, registrarAuditoria, salvar, type UsuarioDb } from "../dados"

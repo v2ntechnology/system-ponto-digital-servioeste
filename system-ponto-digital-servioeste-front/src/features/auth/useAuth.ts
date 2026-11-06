@@ -1,4 +1,4 @@
-import type { Eu, LoginEntrada, LoginResultado } from "@ponto/contracts"
+import type { Eu, LoginEntrada, LoginResultado } from "@/contracts"
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query"
 
 import { api, ApiError, post } from "@/lib/api"

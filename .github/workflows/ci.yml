@@ -6,22 +6,29 @@ on:
   pull_request:
 
 jobs:
-  web:
+  front:
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: system-ponto-digital-servioeste-front
     steps:
       - uses: actions/checkout@v4
       - uses: pnpm/action-setup@v4
+        with:
+          package_json_file: system-ponto-digital-servioeste-front/package.json
       - uses: actions/setup-node@v4
         with:
           node-version: 24
           cache: pnpm
+          cache-dependency-path: system-ponto-digital-servioeste-front/pnpm-lock.yaml
       - run: pnpm install --frozen-lockfile
-      - name: Contrato e tipos gerados estão em dia
+      - name: Tipos do front em dia com o contrato do back
         run: |
           pnpm contracts
-          git diff --exit-code system-ponto-digital-servioeste-back/contracts/src/schema.d.ts
-      - run: pnpm lint:front
-      - run: pnpm test:front
-      - run: pnpm build:front
+          git diff --exit-code src/contracts/schema.d.ts
+      - run: pnpm lint
+      - run: pnpm test
+      - run: pnpm build
       - name: Nenhum dado simulado no build de produção
+        working-directory: .
         run: ./scripts/check-no-mocks.sh

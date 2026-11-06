@@ -1,6 +1,6 @@
 // Cliente da API (base: Servioeste Hub). A sessão vai num cookie httpOnly: o JavaScript nunca toca no token.
 // Os tipos vêm de @ponto/contracts, gerados do openapi.yaml.
-import type { Erro } from "@ponto/contracts"
+import type { Erro } from "@/contracts"
 
 export class ApiError extends Error {
   status: number

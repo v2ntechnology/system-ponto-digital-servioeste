@@ -1,4 +1,4 @@
-import type { Eu, Perfil } from "@ponto/contracts"
+import type { Eu, Perfil } from "@/contracts"
 
 import { useEu } from "@/features/auth/useAuth"
 

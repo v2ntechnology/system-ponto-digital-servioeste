@@ -88,15 +88,15 @@ specs/001-fundacao-cadastros/
 ### Código-fonte (raiz do repositório)
 
 ```text
-Makefile                         # install, contracts, front, front-mock, build-front, check-no-mocks; up, test, admin (Parte B)
-package.json                     # workspace pnpm (atalhos: dev, dev:mock, contracts, build/lint/test:front)
-pnpm-workspace.yaml              # system-ponto-digital-servioeste-front e system-ponto-digital-servioeste-back/contracts
+Makefile                         # atalhos (entra em cada pasta): install, contracts, front, front-mock, build-front,
+                                 # check-no-mocks; up, test, admin (Parte B). A raiz não tem nada de Node.
 .env.example                     # sem segredos reais
 infra/
 ├── docker-compose.yml           # dev: postgres (5434) + api (8002)
 ├── docker-compose.prod.yml      # caddy + api + postgres (homologação/produção)
 └── Caddyfile
-system-ponto-digital-servioeste-front/   # painel do RH e portal (React + Vite)
+system-ponto-digital-servioeste-front/   # painel do RH e portal (React + Vite), projeto Node independente
+├── package.json, pnpm-lock.yaml # script `contracts` gera src/contracts/schema.d.ts do openapi.yaml do back
 ├── index.html
 ├── vite.config.ts               # porta 5175, proxy /api -> 8002, alias @, MSW só no servidor de dev
 ├── components.json              # shadcn new-york, neutral
@@ -104,6 +104,7 @@ system-ponto-digital-servioeste-front/   # painel do RH e portal (React + Vite)
 ├── src/
 │   ├── main.tsx                 # liga MSW só se DEV && VITE_MOCK
 │   ├── App.tsx, rotas.tsx, Providers.tsx
+│   ├── contracts/               # schema.d.ts (gerado, versionado) e index.ts (nomes legíveis dos tipos)
 │   ├── index.css                # tokens do Hub
 │   ├── lib/                     # api.ts, theme.tsx, utils.ts, format.ts, cpf.ts, permissoes.ts
 │   ├── components/
@@ -121,10 +122,8 @@ system-ponto-digital-servioeste-front/   # painel do RH e portal (React + Vite)
 │   └── mocks/                   # browser.ts, util.ts, handlers/*.ts, dados.ts (só dev e testes)
 └── tests/                       # Vitest + Testing Library + MSW no Node
 system-ponto-digital-servioeste-back/    # API, banco e contrato
-├── contracts/                   # dono do contrato da API
-│   ├── openapi.yaml             # fonte da verdade
-│   ├── package.json             # @ponto/contracts (gera os tipos para o front)
-│   └── src/schema.d.ts          # gerado (openapi-typescript), versionado
+├── contracts/
+│   └── openapi.yaml             # contrato da API, fonte da verdade (o back é o dono)
 ├── Dockerfile
 ├── pyproject.toml
 ├── alembic.ini
@@ -151,7 +150,8 @@ scripts/check-no-mocks.sh        # garante que o build de produção não tem na
 
 **Decisão de estrutura** (pedido do usuário, 2026-11-06): repositório único com tudo do frontend em
 `system-ponto-digital-servioeste-front` e tudo do backend em `system-ponto-digital-servioeste-back`. O contrato da API mora no back (`system-ponto-digital-servioeste-back/contracts`), que é quem o implementa; o
-front gera os tipos a partir dele pelo workspace pnpm. `infra/` e `Makefile` seguem o padrão do Servioeste Hub. A
+front gera os tipos a partir dele com o próprio script `contracts`. Front e back são projetos independentes, sem
+workspace na raiz. `infra/` e `Makefile` seguem o padrão do Servioeste Hub. A
 pasta do app mobile e do tablet (Expo) será definida na feature 002/003. O módulo `system-ponto-digital-servioeste-back/app/rep/` concentra ARP e
 NSR desde já, para manter a separação REP × PTRP exigida pelo plano técnico.
 

@@ -12,7 +12,7 @@ Guia de validação. Os detalhes de dados estão em [data-model.md](data-model.m
 ## Etapa A: frontend com dados simulados (antes do backend)
 
 ```bash
-make install           # pnpm install no workspace (system-ponto-digital-servioeste-front + system-ponto-digital-servioeste-back/contracts)
+make install           # pnpm install dentro de system-ponto-digital-servioeste-front
 make contracts         # gera os tipos TypeScript a partir do openapi.yaml
 make front-mock        # VITE_MOCK=true pnpm --filter front dev -> http://localhost:5175
 ```

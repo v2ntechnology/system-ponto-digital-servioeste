@@ -1,4 +1,5 @@
-// Tipos da API gerados de openapi.yaml (fonte da verdade). Não edite schema.d.ts à mão: rode `pnpm contracts`.
+// Tipos da API gerados de ../system-ponto-digital-servioeste-back/contracts/openapi.yaml (fonte da verdade, no back).
+// Não edite schema.d.ts à mão: rode `npm run contracts`.
 import type { components, paths } from "./schema"
 
 export type { components, paths }
